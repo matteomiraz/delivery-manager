@@ -1,0 +1,14 @@
+The Delivery Manager uses the following libraries:
+
+* ReDS (SubVersion snapshot #154)
+  file: reds-svn154.jar
+  released under the LGPL license. 
+  Send and email to "cugola <at> elet <dot> polimi <dot> it" if you are interested.
+
+* Apache Stuff
+  files: axis.jar commons-discovery-0.2.jar commons-logging-1.0.4.jar 
+  released under Apache license
+
+* Java Community Process
+  files: jaxrpc.jar saaj.jar wsdl4j-1.5.1.jar javaee5.jar mail.jar
+
