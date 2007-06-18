@@ -1,0 +1,148 @@
+<project name="DeliverManager" default="pack">
+
+	<!-- where to store the deployable file -->
+	<property name="lib" value="lib"/>
+	<property name="artifacts" value="artifacts"/>
+	<property name="deployable" value="${artifacts}/deliveryManager.ear"/>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" description="--> Clean all subprojects">
+		<delete dir="${artifacts}"/>
+
+		<delete dir="build-core"/>
+		<delete dir="build-registryProxy"/>
+		<delete dir="build-notification"/>
+		<delete dir="build-integration"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${artifacts}"/>
+	</target>
+	
+	<target name="core" depends="init">
+		<mkdir dir="build-core"/>
+
+		<javac srcdir="src-core" destdir="build-core" debug="${debug}" optimize="${optimize}" source="1.5" target="1.5">
+			<classpath>
+				<fileset dir="${lib}" >
+		  			<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+
+		<jar destfile="${artifacts}/core.jar" manifest="manifest.core"> 
+			<fileset dir="build-core"/>
+			<fileset dir="src-core">
+				<include name="META-INF/*"/>
+				<include name="config.properties"/>
+			</fileset>
+			<fileset dir="${lib}">
+				<include name="reds-svn154.jar"/>
+				<include name="license.txt"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="registryProxy" depends="init,core">
+		<mkdir dir="build-registryProxy"/>
+
+		<javac srcdir="srcGen-registryProxy" destdir="build-registryProxy" debug="${debug}" optimize="${optimize}" source="1.5" target="1.5">
+			<classpath>
+				<fileset dir="${artifacts}" >
+		  			<include name="*.jar" />
+				</fileset>
+				<fileset dir="${lib}" >
+		  			<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<javac srcdir="src-registryProxy" destdir="build-registryProxy" debug="${debug}" optimize="${optimize}" source="1.5" target="1.5">
+			<classpath>
+				<dirset dir="build-registryProxy"/>
+				<fileset dir="${artifacts}" >
+		  			<include name="*.jar" />
+				</fileset>
+				<fileset dir="${lib}" >
+		  			<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<jar destfile="${artifacts}/registryProxy.jar" manifest="manifest.registryProxy"> 
+			<fileset dir="build-registryProxy"/>
+			<fileset dir="${lib}">
+				<include name="axis.jar"/>
+				<include name="commons-discovery-0.2.jar"/>
+				<include name="jaxrpc.jar"/>
+				<include name="saaj.jar"/>
+				<include name="license.txt"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="notification" depends="init,core">
+		<mkdir dir="build-notification"/>
+
+		<javac srcdir="src-notification" destdir="build-notification" debug="${debug}" optimize="${optimize}" source="1.5" target="1.5">
+			<classpath>
+				<fileset dir="${artifacts}" >
+		  			<include name="*.jar" />
+				</fileset>
+				<fileset dir="${lib}" >
+		  			<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+
+		<jar destfile="${artifacts}/notification.jar"> 
+			<fileset dir="build-notification"/>
+			<fileset dir="src-notification">
+				<include name="META-INF/*"/>
+			</fileset>
+		</jar>
+
+	</target>
+
+	<target name="integration" depends="init,core">
+		<mkdir dir="build-integration"/>
+
+		<javac srcdir="src-integration" destdir="build-integration" debug="${debug}" optimize="${optimize}" source="1.5" target="1.5">
+			<classpath>
+				<fileset dir="${artifacts}" >
+		  			<include name="*.jar" />
+				</fileset>
+				<fileset dir="${lib}" >
+		  			<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+
+		<jar destfile="${artifacts}/integration.jar"> 
+			<fileset dir="build-integration"/>
+		</jar>
+
+	</target>
+
+	<!-- ================================= 
+          target: pack              
+         ================================= -->
+	<target name="pack" depends="core,notification,registryProxy,integration"
+		 description="--> Create the EAR">
+
+		<!-- create the enterprise archive -->
+                <ear destfile="${artifacts}/deliveryManager.ear" appxml="application.xml" update="false">
+                        <fileset dir="${artifacts}" >
+                                <include name="core.jar"/>
+                                <include name="registryProxy.jar"/>
+				<include name="notification.jar"/>
+				<include name="integration.jar"/>
+                        </fileset>
+                </ear>
+	</target>
+
+	<!-- ================================= 
+          target: rebuild              
+         ================================= -->
+	<target name="rebuild" depends="clean,pack" description="--> Rebuild the EAR "/>
+</project>
