@@ -75,7 +75,7 @@ public class Expire implements IExpire {
 					this.em.remove(fs);
 				}
 			} catch (Exception e) {
-				// il servizio è in nessuna federazione => non devo cancellarlo!
+				// il servizio e' in nessuna federazione => non devo cancellarlo!
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class Expire implements IExpire {
 					this.em.remove(fs);
 				}
 			} catch (Exception e) {
-				// il servizio è in nessuna federazione => non devo cancellarlo!
+				// il servizio e' in nessuna federazione => non devo cancellarlo!
 			}
 		}
 	}

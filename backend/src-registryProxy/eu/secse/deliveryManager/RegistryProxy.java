@@ -380,7 +380,7 @@ public class RegistryProxy implements IRegistryProxy {
 				registryXmlID = null;
 			}
 
-			// devo rimuovere quello che c'è nel registro?
+			// devo rimuovere quello che c'e' nel registro?
 			if(registryXmlID != null && !registryXmlID.equals(receivedXmlID)) {
 				log.debug("Removing the facet xml id " + registryXmlID + " from the registry");
 				registry.removeFacetSpecificationXML(registryXmlID, getCredentials());

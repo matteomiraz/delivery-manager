@@ -85,7 +85,7 @@ public class Update implements IUpdate {
 						this.em.remove(fs);
 					}
 				} catch (Exception e) {
-					// il servizio è in nessuna federazione => non devo cancellarlo!
+					// il servizio e' in nessuna federazione => non devo cancellarlo!
 				}
 			}
 		} catch (Exception e) {
@@ -172,7 +172,7 @@ public class Update implements IUpdate {
 						this.em.remove(fs);
 					}
 				} catch (Exception e) {
-					// il servizio è in nessuna federazione => non devo cancellarlo!
+					// il servizio e' in nessuna federazione => non devo cancellarlo!
 				}
 			}
 		} catch (Exception e) {
