@@ -90,7 +90,7 @@ public class FederationManager implements IFederationManager {
 				for(FederatedElement elem : federation.getElements()) {
 					log.info("removing promotion " + elem.getPromotionId());
 	
-					// LAZY mandare un messaggio "scaduto" x far scadere subito l'elemento... ma può creare problemi di coerenza (x ora infatti verrebbe ignorato)
+					// LAZY mandare un messaggio "scaduto" x far scadere subito l'elemento... ma puo' creare problemi di coerenza (x ora infatti verrebbe ignorato)
 				}
 	
 				Interest i = this.em.find(Interest.class, federation.getInterestId());
@@ -161,7 +161,7 @@ public class FederationManager implements IFederationManager {
 		
 		this.em.remove(felem);
 		
-		// LAZY mandare un messaggio "scaduto" x far scadere subito l'elemento... ma può creare problemi di coerenza (x ora infatti verrebbe ignorato)
+		// LAZY mandare un messaggio "scaduto" x far scadere subito l'elemento... ma puo' creare problemi di coerenza (x ora infatti verrebbe ignorato)
 	}
 
 	public long[] getPromotions(String federationName) 
