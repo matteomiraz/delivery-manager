@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://logger.s2.it" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://logger.s2.it" xmlns:intf="http://logger.s2.it" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns1="http://exception.logger.s2.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.2.1
+Built on Jun 14, 2005 (09:15:57 EDT)-->
+
+   <wsdl:message name="deleteEventRequest">
+
+      <wsdl:part name="applicationId" type="xsd:string"/>
+
+      <wsdl:part name="eventId" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="eventRequest">
+
+      <wsdl:part name="registryId" type="xsd:string"/>
+
+      <wsdl:part name="applicationId" type="xsd:string"/>
+
+      <wsdl:part name="applicationName" type="xsd:string"/>
+
+      <wsdl:part name="userId" type="xsd:string"/>
+
+      <wsdl:part name="registryUserId" type="xsd:string"/>
+
+      <wsdl:part name="event" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getVersionRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="startEventResponse">
+
+      <wsdl:part name="startEventReturn" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="generateIdRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="generateIdResponse">
+
+      <wsdl:part name="generateIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="endEventRequest">
+
+      <wsdl:part name="applicationId" type="xsd:string"/>
+
+      <wsdl:part name="eventId" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="endEventResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="startEventRequest">
+
+      <wsdl:part name="registryId" type="xsd:string"/>
+
+      <wsdl:part name="applicationId" type="xsd:string"/>
+
+      <wsdl:part name="applicationName" type="xsd:string"/>
+
+      <wsdl:part name="userId" type="xsd:string"/>
+
+      <wsdl:part name="registryUserId" type="xsd:string"/>
+
+      <wsdl:part name="event" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="EventNotDeletedException">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="eventResponse">
+
+      <wsdl:part name="eventReturn" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="EventNotAddedException">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="EndEventNotAddedException">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="deleteEventResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getVersionResponse">
+
+      <wsdl:part name="getVersionReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="SeCSELogger">
+
+      <wsdl:operation name="getVersion">
+
+         <wsdl:input message="impl:getVersionRequest" name="getVersionRequest"/>
+
+         <wsdl:output message="impl:getVersionResponse" name="getVersionResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="event" parameterOrder="registryId applicationId applicationName userId registryUserId event">
+
+         <wsdl:input message="impl:eventRequest" name="eventRequest"/>
+
+         <wsdl:output message="impl:eventResponse" name="eventResponse"/>
+
+         <wsdl:fault message="impl:EventNotAddedException" name="EventNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="generateId">
+
+         <wsdl:input message="impl:generateIdRequest" name="generateIdRequest"/>
+
+         <wsdl:output message="impl:generateIdResponse" name="generateIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="startEvent" parameterOrder="registryId applicationId applicationName userId registryUserId event">
+
+         <wsdl:input message="impl:startEventRequest" name="startEventRequest"/>
+
+         <wsdl:output message="impl:startEventResponse" name="startEventResponse"/>
+
+         <wsdl:fault message="impl:EventNotAddedException" name="EventNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="endEvent" parameterOrder="applicationId eventId">
+
+         <wsdl:input message="impl:endEventRequest" name="endEventRequest"/>
+
+         <wsdl:output message="impl:endEventResponse" name="endEventResponse"/>
+
+         <wsdl:fault message="impl:EndEventNotAddedException" name="EndEventNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deleteEvent" parameterOrder="applicationId eventId">
+
+         <wsdl:input message="impl:deleteEventRequest" name="deleteEventRequest"/>
+
+         <wsdl:output message="impl:deleteEventResponse" name="deleteEventResponse"/>
+
+         <wsdl:fault message="impl:EventNotDeletedException" name="EventNotDeletedException"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="SeCSELoggerSoapBinding" type="impl:SeCSELogger">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getVersion">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getVersionRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getVersionResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="event">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="eventRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="eventResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="EventNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="EventNotAddedException" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="generateId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="generateIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="generateIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="startEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="startEventRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="startEventResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="EventNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="EventNotAddedException" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="endEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="endEventRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="endEventResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="EndEventNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="EndEventNotAddedException" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deleteEvent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="deleteEventRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="deleteEventResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="EventNotDeletedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="EventNotDeletedException" namespace="http://logger.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="SeCSELoggerService">
+
+      <wsdl:port binding="impl:SeCSELoggerSoapBinding" name="SeCSELogger">
+
+         <wsdlsoap:address location="http://localhost:8000/Logger/services/SeCSELogger"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
