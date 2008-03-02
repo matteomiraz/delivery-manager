@@ -16,7 +16,12 @@ Insert in _JBOSS_HOME/server/default/deploy_ folder the following files:
  # _mail-service.xml_ and _deliveryManagerJMS-Service.xml_ files that are in descriptors folder of the zip file.
  # _deliverymanager.ear_ file.
 
-==*Configuration file*==
+==*Configuration files*==
+
+===*_mail-service.xml_*===
+This file connects the JavaMail to a gmail account. Please notice that you have to substitute the _username_ and the _password_ with your values.
+
+===*_deliverymanager.ear/deliverymanager.jar/config.properties_*===
 {{{
 RegistryProxy.url=http://localhost:8080/SeCSERegistry/services/SeCSERegistry
 RegistryProxy.username=deliveryManager
