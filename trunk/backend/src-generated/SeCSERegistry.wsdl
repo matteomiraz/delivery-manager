@@ -1,0 +1,2058 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://registry.s2.it" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://registry.s2.it" xmlns:intf="http://registry.s2.it" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns1="http://exception.registry.s2.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.2.1
+Built on Jun 14, 2005 (09:15:57 EDT)-->
+ <wsdl:types>
+  <schema targetNamespace="http://registry.s2.it" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://exception.registry.s2.it"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="ArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="Service">
+    <sequence>
+     <element name="previousVersionId" nillable="true" type="xsd:string"/>
+     <element name="providerId" type="xsd:long"/>
+     <element name="allowAdditionalInformation" type="xsd:boolean"/>
+     <element name="id" nillable="true" type="xsd:string"/>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="version" nillable="true" type="xsd:string"/>
+     <element name="registryId" nillable="true" type="xsd:string"/>
+     <element name="timestamp" nillable="true" type="xsd:string"/>
+     <element name="ISOTimestamp" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Credentials">
+    <sequence>
+     <element name="password" nillable="true" type="xsd:string"/>
+     <element name="login" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType abstract="true" name="AbstractFacetSpecification">
+    <sequence>
+     <element name="providerId" type="xsd:long"/>
+     <element name="document" nillable="true" type="xsd:string"/>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="timestamp" nillable="true" type="xsd:string"/>
+     <element name="ISOTimestamp" nillable="true" type="xsd:string"/>
+     <element name="serviceId" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="FacetSpecificationXSD">
+    <complexContent>
+     <extension base="impl:AbstractFacetSpecification">
+      <sequence>
+       <element name="facetSpecificationXSDId" nillable="true" type="xsd:string"/>
+       <element name="additionalInformation" type="xsd:boolean"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOfFacetSpecificationXSD">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="impl:FacetSpecificationXSD[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ServiceProviderDescription">
+    <sequence>
+     <element name="name" nillable="true" type="xsd:string"/>
+     <element name="id" type="xsd:long"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOf_xsd_long">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:long[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="FacetSpecificationXML">
+    <complexContent>
+     <extension base="impl:AbstractFacetSpecification">
+      <sequence>
+       <element name="facetTypeName" nillable="true" type="xsd:string"/>
+       <element name="facetSpecificationXSDId" nillable="true" type="xsd:string"/>
+       <element name="facetSpecificationXMLId" nillable="true" type="xsd:string"/>
+      </sequence>
+     </extension>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOfFacetSpecificationXML">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="impl:FacetSpecificationXML[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="registerServiceProviderResponse">
+
+      <wsdl:part name="registerServiceProviderReturn" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDByNameRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="XSDNameRegExp" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllFacetTypesRequest">
+
+      <wsdl:part name="serviceIds" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetTypeNamesByServiceIdResponse">
+
+      <wsdl:part name="getFacetTypeNamesByServiceIdReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByFacetTypeNameResponse">
+
+      <wsdl:part name="getServiceIdsByFacetTypeNameReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLByIdReturn" type="intf:FacetSpecificationXML"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCommonFacetSpecificationXSDsResponse">
+
+      <wsdl:part name="getCommonFacetSpecificationXSDsReturn" type="intf:ArrayOfFacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXMLNotRemovedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCommonFacetTypesResponse">
+
+      <wsdl:part name="getCommonFacetTypesReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllServiceIdsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="QueryErrorException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllFacetSpecificationXSDsResponse">
+
+      <wsdl:part name="getAllFacetSpecificationXSDsReturn" type="intf:ArrayOfFacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllFacetTypesResponse">
+
+      <wsdl:part name="getAllFacetTypesReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="deployServiceResponse">
+
+      <wsdl:part name="deployServiceReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationXMLResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="queryResponse">
+
+      <wsdl:part name="queryReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addFacetSpecificationXMLResponse">
+
+      <wsdl:part name="addFacetSpecificationXMLReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetTypeRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="authenticateResponse">
+
+      <wsdl:part name="authenticateReturn" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="undeployServiceResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLIdsByServiceIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLIdsByServiceIdReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAdditionalInformationResponse">
+
+      <wsdl:part name="getAdditionalInformationReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetTypeResponse">
+
+      <wsdl:part name="getFacetTypeReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addWellKnownFacetSpecificationXMLResponse">
+
+      <wsdl:part name="addWellKnownFacetSpecificationXMLReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByFacetSpecificationsRequest">
+
+      <wsdl:part name="fsXSD" type="intf:ArrayOfFacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="unregisterServiceProviderRequest">
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetTypeNamesByServiceIdRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByFacetTypeNameRequest">
+
+      <wsdl:part name="facetTypeNameRegExp" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCommonFacetTypesRequest">
+
+      <wsdl:part name="serviceIds" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByProviderRequest">
+
+      <wsdl:part name="providerId" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceProviderDescriptionByNameResponse">
+
+      <wsdl:part name="getServiceProviderDescriptionByNameReturn" type="intf:ArrayOf_xsd_long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="unregisterServiceProviderResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXMLNotAddedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addFacetSpecificationXMLRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+      <wsdl:part name="fsXML" type="intf:FacetSpecificationXML"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+      <wsdl:part name="enableValidation" type="xsd:boolean"/>
+
+      <wsdl:part name="forceId" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotUnregisteredException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDIdsByServiceIdRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotRegisteredException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByProviderResponse">
+
+      <wsdl:part name="getServiceIdsByProviderReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="listWellKnownFacetSpecificationXSDsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByFacetSpecificationXSDIdRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="registerServiceProviderRequest">
+
+      <wsdl:part name="spd" type="intf:ServiceProviderDescription"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDIdsByServiceIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXSDIdsByServiceIdReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByNameRequest">
+
+      <wsdl:part name="serviceNameRegExp" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationNotRemovedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceProviderDescriptionByIdRequest">
+
+      <wsdl:part name="id" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addFacetSpecificationXSDRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="fsXSD" type="intf:FacetSpecificationXSD"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+      <wsdl:part name="additionalInformation" type="xsd:boolean"/>
+
+      <wsdl:part name="facetType" type="xsd:string"/>
+
+      <wsdl:part name="forceId" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFacetTypeResponse">
+
+      <wsdl:part name="hasFacetTypeReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFacetTypeRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="facetTypeName" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByNameResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLByNameReturn" type="intf:ArrayOfFacetSpecificationXML"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByNameRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="XMLNameRegExp" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationNotRemovedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFacetSpecificationXSDResponse">
+
+      <wsdl:part name="hasFacetSpecificationXSDReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="CredentialsNotValidException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRegistryIdRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDsRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="includeAdditionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllFacetSpecificationXSDsRequest">
+
+      <wsdl:part name="serviceIds" type="intf:ArrayOf_xsd_string"/>
+
+      <wsdl:part name="includeAdditionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRegistryIdResponse">
+
+      <wsdl:part name="getRegistryIdReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceProviderDescriptionByIdResponse">
+
+      <wsdl:part name="getServiceProviderDescriptionByIdReturn" type="intf:ServiceProviderDescription"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceNotUndeployedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotFoundException">
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationXMLByFacetSpecificationXSDIdResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="queryRequest">
+
+      <wsdl:part name="query" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotUnregisteredException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDByNameResponse">
+
+      <wsdl:part name="getFacetSpecificationXSDByNameReturn" type="intf:ArrayOfFacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLsByServiceIdRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="includeAdditionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="QueryNotAllowedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLsByServiceIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLsByServiceIdReturn" type="intf:ArrayOfFacetSpecificationXML"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="QueryNotAllowedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addWellKnownFacetSpecificationXMLRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="wellKnownFacetSpecificationXSD" type="xsd:string"/>
+
+      <wsdl:part name="fsXML" type="intf:FacetSpecificationXML"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+      <wsdl:part name="enableValidation" type="xsd:boolean"/>
+
+      <wsdl:part name="forceId" type="xsd:boolean"/>
+
+      <wsdl:part name="forcedXSDId" type="xsd:string"/>
+
+      <wsdl:part name="additionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByFacetSpecificationsResponse">
+
+      <wsdl:part name="getServiceIdsByFacetSpecificationsReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDByIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXSDByIdReturn" type="intf:FacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXMLNotAddedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceNotDeployedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAdditionalInformationRequest">
+
+      <wsdl:part name="providerId" type="xsd:long"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceProviderDescriptionByNameRequest">
+
+      <wsdl:part name="nameRegExp" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDsResponse">
+
+      <wsdl:part name="getFacetSpecificationXSDsReturn" type="intf:ArrayOfFacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="listWellKnownFacetSpecificationXSDsResponse">
+
+      <wsdl:part name="listWellKnownFacetSpecificationXSDsReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationXMLRequest">
+
+      <wsdl:part name="facetSpecificationXMLId" type="xsd:string"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceNotDeployedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="listWellKnownFacetTypesRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotFoundException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceProviderNotRegisteredException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ServiceNotUndeployedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="LoginAlreadyExistingException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addFacetSpecificationXSDResponse">
+
+      <wsdl:part name="addFacetSpecificationXSDReturn" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCommonFacetSpecificationXSDsRequest">
+
+      <wsdl:part name="serviceIds" type="intf:ArrayOf_xsd_string"/>
+
+      <wsdl:part name="includeAdditionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLIdsByServiceIdRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="includeAdditionalInformation" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="listWellKnownFacetTypesResponse">
+
+      <wsdl:part name="listWellKnownFacetTypesReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXSDNotAddedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceResponse">
+
+      <wsdl:part name="getServiceReturn" type="intf:Service"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="deployServiceRequest">
+
+      <wsdl:part name="sd" type="intf:Service"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+      <wsdl:part name="forceId" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXSDNotAddedException1">
+
+      <wsdl:part name="fault" type="xsd:anyType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFacetSpecificationXSDRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="fsXSD" type="intf:FacetSpecificationXSD"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByFacetSpecificationXSDIdResponse">
+
+      <wsdl:part name="getFacetSpecificationXMLByFacetSpecificationXSDIdReturn" type="intf:FacetSpecificationXML"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="QueryErrorException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllServiceIdsResponse">
+
+      <wsdl:part name="getAllServiceIdsReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXMLByIdRequest">
+
+      <wsdl:part name="facetSpecificationXMLId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="CredentialsNotValidException">
+
+   </wsdl:message>
+
+   <wsdl:message name="LoginAlreadyExistingException">
+
+   </wsdl:message>
+
+   <wsdl:message name="removeFacetSpecificationXMLByFacetSpecificationXSDIdRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getFacetSpecificationXSDByIdRequest">
+
+      <wsdl:part name="facetSpecificationXSDId" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="FacetSpecificationXMLNotRemovedException">
+
+   </wsdl:message>
+
+   <wsdl:message name="getServiceIdsByNameResponse">
+
+      <wsdl:part name="getServiceIdsByNameReturn" type="intf:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="authenticateRequest">
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="undeployServiceRequest">
+
+      <wsdl:part name="serviceId" type="xsd:string"/>
+
+      <wsdl:part name="credentials" type="intf:Credentials"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="SeCSERegistry">
+
+      <wsdl:operation name="query" parameterOrder="query">
+
+         <wsdl:input message="intf:queryRequest" name="queryRequest"/>
+
+         <wsdl:output message="intf:queryResponse" name="queryResponse"/>
+
+         <wsdl:fault message="intf:QueryErrorException1" name="QueryErrorException"/>
+
+         <wsdl:fault message="intf:QueryNotAllowedException1" name="QueryNotAllowedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getService" parameterOrder="serviceId">
+
+         <wsdl:input message="intf:getServiceRequest" name="getServiceRequest"/>
+
+         <wsdl:output message="intf:getServiceResponse" name="getServiceResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="authenticate" parameterOrder="credentials">
+
+         <wsdl:input message="intf:authenticateRequest" name="authenticateRequest"/>
+
+         <wsdl:output message="intf:authenticateResponse" name="authenticateResponse"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRegistryId">
+
+         <wsdl:input message="intf:getRegistryIdRequest" name="getRegistryIdRequest"/>
+
+         <wsdl:output message="intf:getRegistryIdResponse" name="getRegistryIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deployService" parameterOrder="sd credentials forceId">
+
+         <wsdl:input message="intf:deployServiceRequest" name="deployServiceRequest"/>
+
+         <wsdl:output message="intf:deployServiceResponse" name="deployServiceResponse"/>
+
+         <wsdl:fault message="intf:ServiceNotDeployedException1" name="ServiceNotDeployedException"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="undeployService" parameterOrder="serviceId credentials">
+
+         <wsdl:input message="intf:undeployServiceRequest" name="undeployServiceRequest"/>
+
+         <wsdl:output message="intf:undeployServiceResponse" name="undeployServiceResponse"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+         <wsdl:fault message="intf:ServiceNotUndeployedException1" name="ServiceNotUndeployedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDs" parameterOrder="serviceId includeAdditionalInformation">
+
+         <wsdl:input message="intf:getFacetSpecificationXSDsRequest" name="getFacetSpecificationXSDsRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXSDsResponse" name="getFacetSpecificationXSDsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerServiceProvider" parameterOrder="spd credentials">
+
+         <wsdl:input message="intf:registerServiceProviderRequest" name="registerServiceProviderRequest"/>
+
+         <wsdl:output message="intf:registerServiceProviderResponse" name="registerServiceProviderResponse"/>
+
+         <wsdl:fault message="intf:LoginAlreadyExistingException1" name="LoginAlreadyExistingException"/>
+
+         <wsdl:fault message="intf:ServiceProviderNotRegisteredException1" name="ServiceProviderNotRegisteredException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="unregisterServiceProvider" parameterOrder="credentials">
+
+         <wsdl:input message="intf:unregisterServiceProviderRequest" name="unregisterServiceProviderRequest"/>
+
+         <wsdl:output message="intf:unregisterServiceProviderResponse" name="unregisterServiceProviderResponse"/>
+
+         <wsdl:fault message="intf:ServiceProviderNotUnregisteredException1" name="ServiceProviderNotUnregisteredException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByProvider" parameterOrder="providerId">
+
+         <wsdl:input message="intf:getServiceIdsByProviderRequest" name="getServiceIdsByProviderRequest"/>
+
+         <wsdl:output message="intf:getServiceIdsByProviderResponse" name="getServiceIdsByProviderResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAdditionalInformation" parameterOrder="providerId">
+
+         <wsdl:input message="intf:getAdditionalInformationRequest" name="getAdditionalInformationRequest"/>
+
+         <wsdl:output message="intf:getAdditionalInformationResponse" name="getAdditionalInformationResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecification" parameterOrder="facetSpecificationXSDId credentials">
+
+         <wsdl:input message="intf:removeFacetSpecificationRequest" name="removeFacetSpecificationRequest"/>
+
+         <wsdl:output message="intf:removeFacetSpecificationResponse" name="removeFacetSpecificationResponse"/>
+
+         <wsdl:fault message="intf:FacetSpecificationNotRemovedException1" name="FacetSpecificationNotRemovedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceProviderDescriptionById" parameterOrder="id">
+
+         <wsdl:input message="intf:getServiceProviderDescriptionByIdRequest" name="getServiceProviderDescriptionByIdRequest"/>
+
+         <wsdl:output message="intf:getServiceProviderDescriptionByIdResponse" name="getServiceProviderDescriptionByIdResponse"/>
+
+         <wsdl:fault message="intf:ServiceProviderNotFoundException1" name="ServiceProviderNotFoundException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceProviderDescriptionByName" parameterOrder="nameRegExp">
+
+         <wsdl:input message="intf:getServiceProviderDescriptionByNameRequest" name="getServiceProviderDescriptionByNameRequest"/>
+
+         <wsdl:output message="intf:getServiceProviderDescriptionByNameResponse" name="getServiceProviderDescriptionByNameResponse"/>
+
+         <wsdl:fault message="intf:ServiceProviderNotFoundException1" name="ServiceProviderNotFoundException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addFacetSpecificationXSD" parameterOrder="serviceId fsXSD credentials additionalInformation facetType forceId">
+
+         <wsdl:input message="intf:addFacetSpecificationXSDRequest" name="addFacetSpecificationXSDRequest"/>
+
+         <wsdl:output message="intf:addFacetSpecificationXSDResponse" name="addFacetSpecificationXSDResponse"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+         <wsdl:fault message="intf:FacetSpecificationXSDNotAddedException1" name="FacetSpecificationXSDNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDById" parameterOrder="facetSpecificationXSDId">
+
+         <wsdl:input message="intf:getFacetSpecificationXSDByIdRequest" name="getFacetSpecificationXSDByIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXSDByIdResponse" name="getFacetSpecificationXSDByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLIdByFacetSpecificationXSDId" parameterOrder="facetSpecificationXSDId">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLIdByFacetSpecificationXSDIdRequest" name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLIdByFacetSpecificationXSDIdResponse" name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addFacetSpecificationXML" parameterOrder="serviceId facetSpecificationXSDId fsXML credentials enableValidation forceId">
+
+         <wsdl:input message="intf:addFacetSpecificationXMLRequest" name="addFacetSpecificationXMLRequest"/>
+
+         <wsdl:output message="intf:addFacetSpecificationXMLResponse" name="addFacetSpecificationXMLResponse"/>
+
+         <wsdl:fault message="intf:FacetSpecificationXMLNotAddedException1" name="FacetSpecificationXMLNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLById" parameterOrder="facetSpecificationXMLId">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLByIdRequest" name="getFacetSpecificationXMLByIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLByIdResponse" name="getFacetSpecificationXMLByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addWellKnownFacetSpecificationXML" parameterOrder="serviceId wellKnownFacetSpecificationXSD fsXML credentials enableValidation forceId forcedXSDId additionalInformation">
+
+         <wsdl:input message="intf:addWellKnownFacetSpecificationXMLRequest" name="addWellKnownFacetSpecificationXMLRequest"/>
+
+         <wsdl:output message="intf:addWellKnownFacetSpecificationXMLResponse" name="addWellKnownFacetSpecificationXMLResponse"/>
+
+         <wsdl:fault message="intf:FacetSpecificationXMLNotAddedException1" name="FacetSpecificationXMLNotAddedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetType" parameterOrder="facetSpecificationXSDId">
+
+         <wsdl:input message="intf:getFacetTypeRequest" name="getFacetTypeRequest"/>
+
+         <wsdl:output message="intf:getFacetTypeResponse" name="getFacetTypeResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="listWellKnownFacetTypes">
+
+         <wsdl:input message="intf:listWellKnownFacetTypesRequest" name="listWellKnownFacetTypesRequest"/>
+
+         <wsdl:output message="intf:listWellKnownFacetTypesResponse" name="listWellKnownFacetTypesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="listWellKnownFacetSpecificationXSDs">
+
+         <wsdl:input message="intf:listWellKnownFacetSpecificationXSDsRequest" name="listWellKnownFacetSpecificationXSDsRequest"/>
+
+         <wsdl:output message="intf:listWellKnownFacetSpecificationXSDsResponse" name="listWellKnownFacetSpecificationXSDsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecificationXML" parameterOrder="facetSpecificationXMLId credentials">
+
+         <wsdl:input message="intf:removeFacetSpecificationXMLRequest" name="removeFacetSpecificationXMLRequest"/>
+
+         <wsdl:output message="intf:removeFacetSpecificationXMLResponse" name="removeFacetSpecificationXMLResponse"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+         <wsdl:fault message="intf:FacetSpecificationXMLNotRemovedException1" name="FacetSpecificationXMLNotRemovedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecificationXMLByFacetSpecificationXSDId" parameterOrder="facetSpecificationXSDId credentials">
+
+         <wsdl:input message="intf:removeFacetSpecificationXMLByFacetSpecificationXSDIdRequest" name="removeFacetSpecificationXMLByFacetSpecificationXSDIdRequest"/>
+
+         <wsdl:output message="intf:removeFacetSpecificationXMLByFacetSpecificationXSDIdResponse" name="removeFacetSpecificationXMLByFacetSpecificationXSDIdResponse"/>
+
+         <wsdl:fault message="intf:CredentialsNotValidException1" name="CredentialsNotValidException"/>
+
+         <wsdl:fault message="intf:FacetSpecificationXMLNotRemovedException1" name="FacetSpecificationXMLNotRemovedException"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllServiceIds">
+
+         <wsdl:input message="intf:getAllServiceIdsRequest" name="getAllServiceIdsRequest"/>
+
+         <wsdl:output message="intf:getAllServiceIdsResponse" name="getAllServiceIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByName" parameterOrder="serviceNameRegExp">
+
+         <wsdl:input message="intf:getServiceIdsByNameRequest" name="getServiceIdsByNameRequest"/>
+
+         <wsdl:output message="intf:getServiceIdsByNameResponse" name="getServiceIdsByNameResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByFacetSpecifications" parameterOrder="fsXSD">
+
+         <wsdl:input message="intf:getServiceIdsByFacetSpecificationsRequest" name="getServiceIdsByFacetSpecificationsRequest"/>
+
+         <wsdl:output message="intf:getServiceIdsByFacetSpecificationsResponse" name="getServiceIdsByFacetSpecificationsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFacetSpecificationXSD" parameterOrder="serviceId fsXSD">
+
+         <wsdl:input message="intf:hasFacetSpecificationXSDRequest" name="hasFacetSpecificationXSDRequest"/>
+
+         <wsdl:output message="intf:hasFacetSpecificationXSDResponse" name="hasFacetSpecificationXSDResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDByName" parameterOrder="serviceId XSDNameRegExp">
+
+         <wsdl:input message="intf:getFacetSpecificationXSDByNameRequest" name="getFacetSpecificationXSDByNameRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXSDByNameResponse" name="getFacetSpecificationXSDByNameResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDIdsByServiceId" parameterOrder="serviceId">
+
+         <wsdl:input message="intf:getFacetSpecificationXSDIdsByServiceIdRequest" name="getFacetSpecificationXSDIdsByServiceIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXSDIdsByServiceIdResponse" name="getFacetSpecificationXSDIdsByServiceIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLsByServiceId" parameterOrder="serviceId includeAdditionalInformation">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLsByServiceIdRequest" name="getFacetSpecificationXMLsByServiceIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLsByServiceIdResponse" name="getFacetSpecificationXMLsByServiceIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLIdsByServiceId" parameterOrder="serviceId includeAdditionalInformation">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLIdsByServiceIdRequest" name="getFacetSpecificationXMLIdsByServiceIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLIdsByServiceIdResponse" name="getFacetSpecificationXMLIdsByServiceIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLByFacetSpecificationXSDId" parameterOrder="facetSpecificationXSDId">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLByFacetSpecificationXSDIdRequest" name="getFacetSpecificationXMLByFacetSpecificationXSDIdRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLByFacetSpecificationXSDIdResponse" name="getFacetSpecificationXMLByFacetSpecificationXSDIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllFacetSpecificationXSDs" parameterOrder="serviceIds includeAdditionalInformation">
+
+         <wsdl:input message="intf:getAllFacetSpecificationXSDsRequest" name="getAllFacetSpecificationXSDsRequest"/>
+
+         <wsdl:output message="intf:getAllFacetSpecificationXSDsResponse" name="getAllFacetSpecificationXSDsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCommonFacetSpecificationXSDs" parameterOrder="serviceIds includeAdditionalInformation">
+
+         <wsdl:input message="intf:getCommonFacetSpecificationXSDsRequest" name="getCommonFacetSpecificationXSDsRequest"/>
+
+         <wsdl:output message="intf:getCommonFacetSpecificationXSDsResponse" name="getCommonFacetSpecificationXSDsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLByName" parameterOrder="serviceId XMLNameRegExp">
+
+         <wsdl:input message="intf:getFacetSpecificationXMLByNameRequest" name="getFacetSpecificationXMLByNameRequest"/>
+
+         <wsdl:output message="intf:getFacetSpecificationXMLByNameResponse" name="getFacetSpecificationXMLByNameResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByFacetTypeName" parameterOrder="facetTypeNameRegExp">
+
+         <wsdl:input message="intf:getServiceIdsByFacetTypeNameRequest" name="getServiceIdsByFacetTypeNameRequest"/>
+
+         <wsdl:output message="intf:getServiceIdsByFacetTypeNameResponse" name="getServiceIdsByFacetTypeNameResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFacetType" parameterOrder="serviceId facetTypeName">
+
+         <wsdl:input message="intf:hasFacetTypeRequest" name="hasFacetTypeRequest"/>
+
+         <wsdl:output message="intf:hasFacetTypeResponse" name="hasFacetTypeResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetTypeNamesByServiceId" parameterOrder="serviceId">
+
+         <wsdl:input message="intf:getFacetTypeNamesByServiceIdRequest" name="getFacetTypeNamesByServiceIdRequest"/>
+
+         <wsdl:output message="intf:getFacetTypeNamesByServiceIdResponse" name="getFacetTypeNamesByServiceIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllFacetTypes" parameterOrder="serviceIds">
+
+         <wsdl:input message="intf:getAllFacetTypesRequest" name="getAllFacetTypesRequest"/>
+
+         <wsdl:output message="intf:getAllFacetTypesResponse" name="getAllFacetTypesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCommonFacetTypes" parameterOrder="serviceIds">
+
+         <wsdl:input message="intf:getCommonFacetTypesRequest" name="getCommonFacetTypesRequest"/>
+
+         <wsdl:output message="intf:getCommonFacetTypesResponse" name="getCommonFacetTypesResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="SeCSERegistrySoapBinding" type="intf:SeCSERegistry">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="query">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="queryRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="queryResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="QueryErrorException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="QueryErrorException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="QueryNotAllowedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="QueryNotAllowedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getService">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="authenticate">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="authenticateRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="authenticateResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRegistryId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRegistryIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRegistryIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deployService">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="deployServiceRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="deployServiceResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="ServiceNotDeployedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceNotDeployedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="undeployService">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="undeployServiceRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="undeployServiceResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="ServiceNotUndeployedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceNotUndeployedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDs">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXSDsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXSDsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="registerServiceProvider">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="registerServiceProviderRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="registerServiceProviderResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="LoginAlreadyExistingException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="LoginAlreadyExistingException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="ServiceProviderNotRegisteredException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceProviderNotRegisteredException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="unregisterServiceProvider">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="unregisterServiceProviderRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="unregisterServiceProviderResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="ServiceProviderNotUnregisteredException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceProviderNotUnregisteredException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByProvider">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceIdsByProviderRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceIdsByProviderResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAdditionalInformation">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAdditionalInformationRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAdditionalInformationResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecification">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeFacetSpecificationRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeFacetSpecificationResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="FacetSpecificationNotRemovedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationNotRemovedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceProviderDescriptionById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceProviderDescriptionByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceProviderDescriptionByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="ServiceProviderNotFoundException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceProviderNotFoundException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceProviderDescriptionByName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceProviderDescriptionByNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceProviderDescriptionByNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="ServiceProviderNotFoundException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="ServiceProviderNotFoundException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addFacetSpecificationXSD">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addFacetSpecificationXSDRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addFacetSpecificationXSDResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="FacetSpecificationXSDNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationXSDNotAddedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXSDByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXSDByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLIdByFacetSpecificationXSDId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLIdByFacetSpecificationXSDIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addFacetSpecificationXML">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addFacetSpecificationXMLRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addFacetSpecificationXMLResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="FacetSpecificationXMLNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationXMLNotAddedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLByIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLByIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addWellKnownFacetSpecificationXML">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addWellKnownFacetSpecificationXMLRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addWellKnownFacetSpecificationXMLResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="FacetSpecificationXMLNotAddedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationXMLNotAddedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetType">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetTypeRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetTypeResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="listWellKnownFacetTypes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="listWellKnownFacetTypesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="listWellKnownFacetTypesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="listWellKnownFacetSpecificationXSDs">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="listWellKnownFacetSpecificationXSDsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="listWellKnownFacetSpecificationXSDsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecificationXML">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeFacetSpecificationXMLRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeFacetSpecificationXMLResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="FacetSpecificationXMLNotRemovedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationXMLNotRemovedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeFacetSpecificationXMLByFacetSpecificationXSDId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeFacetSpecificationXMLByFacetSpecificationXSDIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeFacetSpecificationXMLByFacetSpecificationXSDIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+         <wsdl:fault name="CredentialsNotValidException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="CredentialsNotValidException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+         <wsdl:fault name="FacetSpecificationXMLNotRemovedException">
+
+            <wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" name="FacetSpecificationXMLNotRemovedException" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:fault>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllServiceIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllServiceIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllServiceIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceIdsByNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceIdsByNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByFacetSpecifications">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceIdsByFacetSpecificationsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceIdsByFacetSpecificationsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFacetSpecificationXSD">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="hasFacetSpecificationXSDRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="hasFacetSpecificationXSDResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDByName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXSDByNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXSDByNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXSDIdsByServiceId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXSDIdsByServiceIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXSDIdsByServiceIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLsByServiceId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLsByServiceIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLsByServiceIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLIdsByServiceId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLIdsByServiceIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLIdsByServiceIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLByFacetSpecificationXSDId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLByFacetSpecificationXSDIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLByFacetSpecificationXSDIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllFacetSpecificationXSDs">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllFacetSpecificationXSDsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllFacetSpecificationXSDsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCommonFacetSpecificationXSDs">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCommonFacetSpecificationXSDsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCommonFacetSpecificationXSDsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetSpecificationXMLByName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetSpecificationXMLByNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetSpecificationXMLByNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getServiceIdsByFacetTypeName">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getServiceIdsByFacetTypeNameRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getServiceIdsByFacetTypeNameResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFacetType">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="hasFacetTypeRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="hasFacetTypeResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getFacetTypeNamesByServiceId">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getFacetTypeNamesByServiceIdRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getFacetTypeNamesByServiceIdResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllFacetTypes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllFacetTypesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllFacetTypesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCommonFacetTypes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCommonFacetTypesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCommonFacetTypesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://registry.s2.it" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="SeCSERegistryService">
+
+      <wsdl:port binding="intf:SeCSERegistrySoapBinding" name="SeCSERegistry">
+
+         <wsdlsoap:address location="http://momocs:8080/SeCSERegistry/services/SeCSERegistry"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
