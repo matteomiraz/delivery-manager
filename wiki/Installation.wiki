@@ -1,4 +1,4 @@
-#labels Phase-Deploy
+#labels Phase-Deploy,Featured
 =Delivery Manager Installation Guide=
 ==*Software requirements:*==
  * Java Development Kit 5.0
