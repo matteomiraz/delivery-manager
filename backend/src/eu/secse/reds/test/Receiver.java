@@ -45,16 +45,14 @@ import polimi.reds.broker.routing.SubscriptionForwardingRoutingStrategy;
 import polimi.reds.broker.routing.SubscriptionTable;
 import eu.secse.reds.LoggingRouter;
 import eu.secse.reds.filters.WakeUpFilter;
-import eu.secse.reds.messages.WakeUpMessage;
 
 public class Receiver {
 
 	private static final int REDS_TCP_PORT = 5555;
-	private static final long STEP = 20 * 30 * 1000;
 
 	/**
-	 * Usage: java eu.secse.reds.Broker otherBroker listeningPort<br>
-	 * where <b>otherBroker</b> is the ReDS url of the other broker (reds-tcp:host:port), and 
+	 * Usage: java eu.secse.reds.test.Receiver otherBroker listeningPort<br>
+	 * where <b>otherBroker</b> is the ReDS host of the other broker (it will connect to the 5555 port (the default)), and 
 	 * <b>listeningPort</b> is the incoming TCP port of this broker. 
 	 * @param args
 	 */
@@ -136,18 +134,19 @@ public class Receiver {
 		
 		final LocalDispatchingService ds = new LocalDispatchingService(localTransport);
 		
-		// create the interest and perform the subscription
-		ds.subscribe(new WakeUpFilter());
-		
 		Thread wakeup = new Thread(new Runnable() {
 			public void run() {
 				try {
 					ds.open();
 					
+					// create the interest and perform the subscription
+					ds.subscribe(new WakeUpFilter());
+					
 					while (true) {
 						// wait for the next message
 						Message m = ds.getNextMessage();
-						System.out.println("Received " + m);
+						logger.fine("Received: " + m);
+						
 					}
 				} catch (ConnectException e) {
 					System.err.println("Connection problem: " + e.getMessage() + "\n   due to: " + e.getCause());
