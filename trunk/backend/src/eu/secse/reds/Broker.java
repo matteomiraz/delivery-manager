@@ -51,7 +51,7 @@ public class Broker {
 
 	/**
 	 * Usage: java eu.secse.reds.Broker otherBroker listeningPort<br>
-	 * where <b>otherBroker</b> is the ReDS url of the other broker (reds-tcp:host:port), and 
+	 * where <b>otherBroker</b> is the ReDS host of the other broker (it will connect to the 5555 port (the default)), and 
 	 * <b>listeningPort</b> is the incoming TCP port of this broker. 
 	 * @param args
 	 */

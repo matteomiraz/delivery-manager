@@ -48,11 +48,11 @@ import eu.secse.reds.messages.WakeUpMessage;
 public class Sender {
 
 	private static final int REDS_TCP_PORT = 5555;
-	private static final long STEP = 20 * 30 * 1000;
+	private static final long STEP = 5 * 1000;
 
 	/**
-	 * Usage: java eu.secse.reds.Broker otherBroker listeningPort<br>
-	 * where <b>otherBroker</b> is the ReDS url of the other broker (reds-tcp:host:port), and 
+	 * Usage: java eu.secse.reds.test.Sender otherBroker listeningPort<br>
+	 * where <b>otherBroker</b> is the ReDS host of the other broker (it will connect to the 5555 port (the default)), and 
 	 * <b>listeningPort</b> is the incoming TCP port of this broker. 
 	 * @param args
 	 */
