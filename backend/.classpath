@@ -2,7 +2,11 @@
 <classpath>
 	<classpathentry excluding="eu/secse/deliveryManager/federations/svn/props/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-generated"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
+		<accessrules>
+			<accessrule kind="accessible" pattern="javax/**"/>
+		</accessrules>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1.4.jar"/>

@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package eu.secse.reds;
+package eu.secse.reds.test;
 
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -42,9 +42,10 @@ import polimi.reds.broker.routing.ReplyManager;
 import polimi.reds.broker.routing.ReplyTable;
 import polimi.reds.broker.routing.SubscriptionForwardingRoutingStrategy;
 import polimi.reds.broker.routing.SubscriptionTable;
+import eu.secse.reds.LoggingRouter;
 import eu.secse.reds.messages.WakeUpMessage;
 
-public class Broker {
+public class Sender {
 
 	private static final int REDS_TCP_PORT = 5555;
 	private static final long STEP = 20 * 30 * 1000;
@@ -139,15 +140,18 @@ public class Broker {
 					ds.open();
 					
 					while (true) {
+						// create a message and log it
 						WakeUpMessage w = new WakeUpMessage(System.currentTimeMillis());
-						ds.publish(w);
 						logger.fine("Sending wakeup: " + w.toString());
+						
+						// send the message
+						ds.publish(w);
+						
 						Thread.sleep(STEP);
 					}
 				} catch (InterruptedException e) {
 				} catch (ConnectException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Connection problem: " + e.getMessage() + "\n   due to: " + e.getCause());
 				}
 			}
 		});
