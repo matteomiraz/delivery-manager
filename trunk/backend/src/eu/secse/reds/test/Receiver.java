@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package eu.secse.reds;
+package eu.secse.reds.test;
 
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import polimi.reds.LocalDispatchingService;
+import polimi.reds.Message;
 import polimi.reds.broker.overlay.AlreadyAddedNeighborException;
 import polimi.reds.broker.overlay.GenericOverlay;
 import polimi.reds.broker.overlay.LocalTransport;
@@ -42,9 +43,11 @@ import polimi.reds.broker.routing.ReplyManager;
 import polimi.reds.broker.routing.ReplyTable;
 import polimi.reds.broker.routing.SubscriptionForwardingRoutingStrategy;
 import polimi.reds.broker.routing.SubscriptionTable;
+import eu.secse.reds.LoggingRouter;
+import eu.secse.reds.filters.WakeUpFilter;
 import eu.secse.reds.messages.WakeUpMessage;
 
-public class Broker {
+public class Receiver {
 
 	private static final int REDS_TCP_PORT = 5555;
 	private static final long STEP = 20 * 30 * 1000;
@@ -133,21 +136,21 @@ public class Broker {
 		
 		final LocalDispatchingService ds = new LocalDispatchingService(localTransport);
 		
+		// create the interest and perform the subscription
+		ds.subscribe(new WakeUpFilter());
+		
 		Thread wakeup = new Thread(new Runnable() {
 			public void run() {
 				try {
 					ds.open();
 					
 					while (true) {
-						WakeUpMessage w = new WakeUpMessage(System.currentTimeMillis());
-						ds.publish(w);
-						logger.fine("Sending wakeup: " + w.toString());
-						Thread.sleep(STEP);
+						// wait for the next message
+						Message m = ds.getNextMessage();
+						System.out.println("Received " + m);
 					}
-				} catch (InterruptedException e) {
 				} catch (ConnectException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.err.println("Connection problem: " + e.getMessage() + "\n   due to: " + e.getCause());
 				}
 			}
 		});
