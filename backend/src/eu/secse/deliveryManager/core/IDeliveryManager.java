@@ -177,4 +177,13 @@ public interface IDeliveryManager {
 	 * @return the Delivery Manager version
 	 */
 	public String getVersion();
+	
+	/**
+	 * This method states wherever an element is known by the marketplace (either for a sharing or for a receivement)
+	 * @param serviceId the service id
+	 * @param facetId (optional) the facet id
+	 * @return true if the element (either a service or a facet) is shared in the marketplace (thus it is shared or received by this node ) 
+	 */
+	public boolean isInSharing(String serviceId, String facetId);
+
 }

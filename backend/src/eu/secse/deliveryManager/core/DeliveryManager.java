@@ -125,7 +125,6 @@ public class DeliveryManager implements IDeliveryManager  {
 		else throw new NotFoundException("Impossible retrieve ElementExtraInfo with id "+id);
 	}
 	
-	
 	@WebMethod public GenericInterest getInterestById(@WebParam(name="interestId")long id)
 			throws NotSubscribedException {
 		log.debug("getting interest by id "+id);
@@ -143,8 +142,6 @@ public class DeliveryManager implements IDeliveryManager  {
 			}
 		}
 	}
-	
-
 
 	@WebMethod public long shareAllServiceAdditionalInformations(@WebParam(name="serviceId") String serviceId) throws NotFoundException {
 		log.debug("Sharing service " + serviceId + " and all its facets"); 
@@ -368,5 +365,18 @@ public class DeliveryManager implements IDeliveryManager  {
 		return "2.0.0";
 	}
 
+	
+	@WebMethod public boolean isInSharing(@WebParam(name="serviceId") String serviceId, @WebParam(name="facetId") String facetId) {
+		ElementEnt elem = null;
+		if(facetId == null) 
+			elem = modelManager.lookup(serviceId);
+		else 
+			elem = modelManager.lookup(serviceId, facetId);
+		
+		if(elem == null) return false;
+		if(elem.getExtraInfo().containsKey(CreatedElementExtraInfo.INFO_TYPE)) return true;
+		if(elem.getExtraInfo().containsKey(ReceivedElementExtraInfo.INFO_TYPE)) return true;
+		return false;
+	}
 
 }

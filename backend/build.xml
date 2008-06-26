@@ -4,8 +4,7 @@
 	<property name="artifacts" value="artifacts"/>
 	<property name="build" value="build"/>
 	<property name="lib" value="lib"/>
-	<property name="registryComponents" value="../registry"/>
-	
+
 	<property name="deployable" value="${artifacts}/deliveryManager.ear"/>
 
 	<path id="source.path">
@@ -23,6 +22,7 @@
 	</fileset>
 
 	<fileset dir="build" id="fileset.directory" >
+		<exclude name="**/dire/registry/**" />
 		<exclude name="**/deliveryManager/utils/*" />
 		<exclude name="**/deliveryManager/**" />
 		<exclude name="**/it/**" />
@@ -43,6 +43,8 @@
 
 	<fileset dir="build" id="fileset.deliverymanager" >
 		<!-- Using naming convention -->
+		<exclude name="**/dire/registry/data/*" />
+		<exclude name="**/dire/registry/Registry*" />
 		<exclude name="**/it/**" />
 		<exclude name="**/federationDirectory/**" />
 		<exclude name="**/deliveryManager/utils/*" />
@@ -66,10 +68,10 @@
 	</target>
 
 	<!-- 
-		 ====================================================== 
+         ====================================================== 
 	     Pack the delivery manager only
          ======================================================
-    -->
+        -->
 	<target name="pack-deliverymanager" depends="compile,pack-delivery-jar,pack-wsproxy">
 
 		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
@@ -97,13 +99,25 @@
 		<property name="build.delivery" value="fileset.deliverymanager" />
 		<antcall target="pack-full"/>
 		<antcall target="pack-broker"/>
+		<antcall target="pack-registry"/>
+		
+		<zip destfile="${artifacts}/dire.zip">
+			<fileset dir="${artifacts}">
+				<include name="deliverymanager.ear"/>
+				<include name="registry.jar"/>
+			</fileset>
+			<fileset dir="descriptors">
+				<include name="*"/>
+			</fileset>
+		</zip>
+
 	</target>
 
 	<!-- 
-		 ====================================================== 
+         ====================================================== 
 	     Pack the federation directory only
          ======================================================
-    -->
+        -->
 	<target name="pack-directory" depends="compile,pack-directory-jar,pack-wsproxy">
 
 		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
@@ -115,10 +129,10 @@
 	</target>
 
 	<!-- 
-		 =======================================================
+         =======================================================
 	     Pack the delivery manager with the federation directory
          =======================================================
-    -->
+        -->
 	<target name="pack-full" depends="compile,pack-both,pack-wsproxy">
 		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
 			<fileset dir="${artifacts}">
@@ -132,24 +146,13 @@
 				<include name="*.properties"/>
 			</fileset>
 		</delete>
-		<zip destfile="${artifacts}/deliveryManager.zip">
-			<fileset dir="${artifacts}">
-				<include name="deliverymanager.ear"/>
-			</fileset>
-			<fileset dir="${registryComponents}">
-				<include name="*"/>
-			</fileset>
-			<fileset dir="descriptors">
-				<include name="*"/>
-			</fileset>
-		</zip>
 	</target>
 
 	<!-- 
-		 =======================================================
+         =======================================================
 	     Interactive packing
          =======================================================
-    -->
+        -->
 	<target name="pack-interactive" depends="init" description="Interactive packing">
 		<input message="Do you want to include the Delivery Manager? (Y/n):" addproperty="pack.delivery" validargs="y,n" defaultvalue="y" />
 		<input message="Do you want to include the Federation Directory? (y/N):" addproperty="pack.directory" validargs="y,n" defaultvalue="y" />
@@ -176,7 +179,7 @@
 		<input message="Fully qualified name of the machine? :" addproperty="directory.endpoint" defaultvalue="localhost" />
 		<input message="Port to use for gossiping? :" addproperty="gossip.port" defaultvalue="5556" />
 		<input message="Port to use for reds? :" addproperty="reds.port" defaultvalue="5555" />
-		<echo append="false" file="conf/generated/extra.properties" message="${line.separator}Directory.WSEndpoint=http://${directory.endpoint}:8080/deliverymanager/DirectoryLookupWS">
+		<echo append="false" file="conf/generated/extra.properties" message="${line.separator}Directory.WSEndpoint=http://${directory.endpoint}:8080/deliverymanager-deliverymanager/DirectoryLookupWS">
 		</echo>
 		<echo append="true" file="conf/generated/extra.properties" message="${line.separator}Gossip.Port:${gossip.port}">
 		</echo>
@@ -295,7 +298,7 @@
 
 
 	<target name="compile" depends="init">
-		<javac destdir="${build}" debug="true" optimize="${optimize}" source="1.5" target="1.5">
+		<javac destdir="${build}" debug="true" optimize="true" source="1.5" target="1.5">
 			<src refid="source.path" />
 			<classpath>
 				<fileset dir="${lib}">
@@ -317,11 +320,39 @@
 		</jar>
 		<mkdir dir="${artifacts}/lib"/>
 		<copy todir="${artifacts}/lib" file="${lib}/reds.jar"/>
+		<copy todir="${artifacts}" file="startBroker.sh"/>
+		<copy todir="${artifacts}" file="stopBroker.sh"/>
 		<zip destfile="${artifacts}/broker.zip">
 			<fileset dir="${artifacts}">
+				<include name="startBroker.sh"/>
+				<include name="stopBroker.sh"/>
 				<include name="broker.jar"/>
 				<include name="lib/reds.jar"/>
 			</fileset>
 		</zip>
+		<tar destfile="${artifacts}/broker.tgz" compression="gzip">
+			<fileset dir="${artifacts}">
+				<include name="startBroker.sh"/>
+				<include name="stopBroker.sh"/>
+				<include name="broker.jar"/>
+				<include name="lib/reds.jar"/>
+			</fileset>
+		</tar>
 	</target>
+	
+	<!-- ================================= 
+          target: pack-registry              
+         ================================= -->
+    <target name="pack-registry" depends="compile" description="--> Create deployable registry">
+		<jar destfile="${artifacts}/registry.jar" update="true">
+			<fileset dir="${build}">
+			    <include name="dire/registry/**"/>
+			    <include name="**/IUpdate.class"/>
+			</fileset>
+			<fileset dir="conf/registry">
+			    <include name="**"/>
+			</fileset>
+		</jar>
+    </target>
+
 </project>
