@@ -8,7 +8,7 @@ import eu.secse.deliveryManager.utils.LogFileCreator;
 
 public class RedsPerformanceLogger {
 	
-	public static final boolean LOG_MATCH_TIME = true;
+	public static final boolean LOG_MATCH_TIME = false;
 	private static final String PREFIX_MATCH_TIME = "MATCH";
 	
 	public static final boolean LOG_MESSAGES = true;

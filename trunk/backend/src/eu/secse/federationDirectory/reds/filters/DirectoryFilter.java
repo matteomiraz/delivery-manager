@@ -29,8 +29,7 @@ public class DirectoryFilter implements ComparableFilter {
 	private static final long serialVersionUID = 9114193783886521242L;
 
 	public boolean isCoveredBy(ComparableFilter filter) {
-		if (filter instanceof DirectoryFilter) return true;
-		return false;
+		return (filter instanceof DirectoryFilter);
 	}
 
 	public boolean matches(Message msg) {

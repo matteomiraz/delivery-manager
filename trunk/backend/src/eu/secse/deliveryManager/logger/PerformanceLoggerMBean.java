@@ -126,6 +126,7 @@ public class PerformanceLoggerMBean implements IPerformanceLoggerMBean  {
 	public boolean isEnabled() {
 		return enabled;
 	}
+	
 	/* (non-Javadoc)
 	 * @see eu.secse.deliveryManager.logger.IPerformanceLoggerMBean#setEnabled(boolean)
 	 */
