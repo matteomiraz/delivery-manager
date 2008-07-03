@@ -1,0 +1,81 @@
+<definitions name="FederationDirectory" targetNamespace="http://secse.eu/federationDirectory/webservice" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://secse.eu/federationDirectory/webservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ <types>
+  <schema elementFormDefault="qualified" targetNamespace="http://secse.eu/federationDirectory/webservice" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:soap11-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://secse.eu/federationDirectory/webservice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <complexType name="WSFederationData">
+    <sequence>
+     <element name="data" nillable="true" type="string"/>
+    </sequence>
+   </complexType>
+   <complexType name="WSFederationDataArray">
+    <sequence>
+     <element name="data" nillable="true" type="string"/>
+    </sequence>
+   </complexType>
+  </schema>
+ </types>
+ <message name="IDirectoryLookupWS_getAllFederationsResponse">
+  <part name="result" type="tns:WSFederationDataArray"/>
+ </message>
+ <message name="IDirectoryLookupWS_searchFederationByUidResponse">
+  <part name="result" type="tns:WSFederationData"/>
+ </message>
+ <message name="IDirectoryLookupWS_searchFederationByName">
+  <part name="String_1" type="xsd:string"/>
+ </message>
+ <message name="IDirectoryLookupWS_searchFederationByUid">
+  <part name="String_1" type="xsd:string"/>
+ </message>
+ <message name="IDirectoryLookupWS_searchFederationByNameResponse">
+  <part name="result" type="tns:WSFederationDataArray"/>
+ </message>
+ <message name="IDirectoryLookupWS_getAllFederations"/>
+ <portType name="IDirectoryLookupWS">
+  <operation name="getAllFederations">
+   <input message="tns:IDirectoryLookupWS_getAllFederations"/>
+   <output message="tns:IDirectoryLookupWS_getAllFederationsResponse"/>
+  </operation>
+  <operation name="searchFederationByName" parameterOrder="String_1">
+   <input message="tns:IDirectoryLookupWS_searchFederationByName"/>
+   <output message="tns:IDirectoryLookupWS_searchFederationByNameResponse"/>
+  </operation>
+  <operation name="searchFederationByUid" parameterOrder="String_1">
+   <input message="tns:IDirectoryLookupWS_searchFederationByUid"/>
+   <output message="tns:IDirectoryLookupWS_searchFederationByUidResponse"/>
+  </operation>
+ </portType>
+ <binding name="IDirectoryLookupWSBinding" type="tns:IDirectoryLookupWS">
+  <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <operation name="getAllFederations">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </input>
+   <output>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </output>
+  </operation>
+  <operation name="searchFederationByName">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </input>
+   <output>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </output>
+  </operation>
+  <operation name="searchFederationByUid">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </input>
+   <output>
+    <soap:body namespace="http://secse.eu/federationDirectory/webservice" use="literal"/>
+   </output>
+  </operation>
+ </binding>
+ <service name="FederationDirectory">
+  <port binding="tns:IDirectoryLookupWSBinding" name="IDirectoryLookupWSPort">
+   <soap:address location="http://Gemini:8080/directory/DirectoryLookupWS"/>
+  </port>
+ </service>
+</definitions>
