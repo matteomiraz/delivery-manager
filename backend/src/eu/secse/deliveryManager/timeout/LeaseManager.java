@@ -26,6 +26,8 @@ import javax.ejb.Stateless;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eu.secse.deliveryManager.data.ElementEnt;
+import eu.secse.deliveryManager.data.ElementExtraInfo;
 import eu.secse.deliveryManager.utils.IConfiguration;
 
 @Stateless
@@ -79,7 +81,11 @@ public class LeaseManager implements ILeaseManager {
 	/* (non-Javadoc)
 	 * @see eu.secse.deliveryManager.ILeaseManager#getLease()
 	 */
-	public Date getLease() {
+	public Date getLease(ElementEnt elem) {
+		
+		ElementExtraInfo elementLease = elem.getExtraInfo().get(LeaseExtraInfo.INFO_TYPE);
+		if(elementLease != null && elementLease instanceof LeaseExtraInfo) return ((LeaseExtraInfo)elementLease).getLease();
+		
 		if (leaseTimeout == null) {
 			try {
 				String step = conf.getString("LeaseManager.leaseTimeout");

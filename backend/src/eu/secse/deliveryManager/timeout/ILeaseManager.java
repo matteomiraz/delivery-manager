@@ -40,12 +40,14 @@ import java.util.Date;
 
 import javax.ejb.Local;
 
+import eu.secse.deliveryManager.data.ElementEnt;
+
 @Local
 public interface ILeaseManager {
 
 	public Date getInitialRenew();
 	public Date getStandardRenew();
 
-	public Date getLease();
+	public Date getLease(ElementEnt elem);
 
 }

@@ -61,9 +61,6 @@ public class FederatedPromotion {
 	
 	protected FederatedPromotion() { /* empty constructor */ }
 
-	//TODO (check): No public constructors, how can I create instances???
-
-	//FederatedPromotion(FederationEnt federation, ElementEnt element, FederatedPromotionExtraInfo extraInfo, boolean shareAll) {
 	public FederatedPromotion(FederationEnt federation, ElementEnt element, FederatedPromotionExtraInfo extraInfo, boolean shareAll) {
 		this.federation = federation;
 		this.element = element;

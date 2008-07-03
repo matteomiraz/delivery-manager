@@ -43,6 +43,7 @@ import eu.secse.deliveryManager.model.FacetSpecXML;
 import eu.secse.deliveryManager.sharing.data.CreatedElementExtraInfo;
 import eu.secse.deliveryManager.sharing.data.ReceivedElementExtraInfo;
 import eu.secse.deliveryManager.timeout.ILeaseManager;
+import eu.secse.deliveryManager.timeout.LeaseExtraInfo;
 
 @Stateless
 public class ShareManager implements IShareManager{
@@ -126,7 +127,7 @@ public class ShareManager implements IShareManager{
 		em.flush();
 
 		//publish service with specificationfacet
-		dsrv.setInfo(iLease.getLease());
+		dsrv.setInfo(iLease.getLease(srv));
 		redsManager.publish(dsrv);
 
 		//	add additional facets
@@ -136,7 +137,7 @@ public class ShareManager implements IShareManager{
 			Collection<FacetAddInfo> facetAddInfo = modelManager.getFacetAdditionalInfo(dsrv.getServiceID());
 			if(facetAddInfo!=null){
 				for (FacetAddInfo f : facetAddInfo) {
-					f.setInfo(iLease.getLease());
+					f.setInfo(iLease.getLease(srv));
 					redsManager.publish(f);
 				}
 			}
@@ -149,7 +150,7 @@ public class ShareManager implements IShareManager{
 		((CreatedElementExtraInfo)facetEnt.getExtraInfo().get(CreatedElementExtraInfo.INFO_TYPE)).setRenew(iLease.getStandardRenew());
 		em.flush();
 
-		facetAddInfo.setInfo(iLease.getLease());
+		facetAddInfo.setInfo(iLease.getLease(facetEnt));
 
 		redsManager.publish(facetAddInfo);
 	}
@@ -198,6 +199,18 @@ public class ShareManager implements IShareManager{
 			extraInfo.setExpire(lease);
 			em.flush();
 		}
+		
+		LeaseExtraInfo leaseExtraInfo = (LeaseExtraInfo)elementEnt.getExtraInfo().get(LeaseExtraInfo.INFO_TYPE);
+		if(leaseExtraInfo == null) {
+			leaseExtraInfo = new LeaseExtraInfo(elementEnt, lease);
+			elementEnt.getExtraInfo().put(LeaseExtraInfo.INFO_TYPE, leaseExtraInfo);
+			em.persist(leaseExtraInfo);
+			em.flush();
+		} else{
+			leaseExtraInfo.setLease(lease);
+			em.flush();
+		}
+		
 		return extraInfo;
 	}
 
