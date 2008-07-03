@@ -31,40 +31,20 @@ import eu.secse.deliveryManager.model.FacetSpecXML;
 
 public interface FederationProxy {
 	
-	/**
-	 * 
-	 * @param serv
-	 * @param service
-	 */
 	public void addService(FederatedPromotion prom, DService serv);
 	public void addFacetSpec(FederatedPromotion prom, FacetSpec facetSpecification);
 	public void addFacetAddInfo(FederatedPromotion prom, FacetAddInfo facetAddInfo);
 	public void addFacetXml(FederatedPromotion prom, FacetSpecXML xml, Date dmTimestamp, String facetSchemaId);
-	
-//	/** TODO: change the model 
-//	 * Semantics: the given element must be deleted. The collection of promotions contains all the promotions
-//	 * that must be dismissed because of the 
-//	 * 
-//	 * @param elementoCancellato
-//	 * @param prom
-//	 */
-//	public void delete(ElementEnt elementoCancellato, Collection<FederatedPromotion> prom );
 	
 	public void delete(FederatedPromotion prom,ElementEnt elementoCancellato);
 	
 	public void join(FederationEnt federation, Map<String,String> options);
 	public void leave(FederationEnt federation);
 	
-	
 	public Map<String,String> getFederationCreationOptions(String federationid);
 	
-	/** Perform any action which is needed to dismiss the federation.
-	 * 
-	 * @param federation
-	 */
+	/** Perform any action which is needed to dismiss the federation. */
 	public void dismissFederation(FederationEnt federation);
-	
-	
 		
 	public void initialize();
 	public void stop();

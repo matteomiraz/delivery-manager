@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package eu.secse.deliveryManager.federations.pubsubscribe.core;
+package eu.secse.deliveryManager.federations.securepubsub.core;
 
 import java.util.Collection;
 import java.util.Date;
@@ -48,9 +48,9 @@ import eu.secse.deliveryManager.data.FederationEnt;
 import eu.secse.deliveryManager.data.FederationExtraInfo;
 import eu.secse.deliveryManager.data.ServiceEnt;
 import eu.secse.deliveryManager.exceptions.NotFoundException;
-import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubFedElemExtraInfo;
-import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubFederationExtraInfo;
-import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubPromotionExtraInfo;
+import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubFedElemExtraInfo;
+import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubFederationExtraInfo;
+import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubPromotionExtraInfo;
 import eu.secse.deliveryManager.interest.InterestFederation;
 import eu.secse.deliveryManager.model.DFederation;
 import eu.secse.deliveryManager.model.DService;
@@ -64,9 +64,9 @@ import eu.secse.deliveryManager.timeout.LeaseExtraInfo;
 
 
 @Stateless
-public class PubSubProxy implements IPubSubProxy{
+public class SecPubSubProxy implements ISecPubSubProxy{
 
-	private static final Log log = LogFactory.getLog(IPubSubProxy.class);
+	private static final Log log = LogFactory.getLog(ISecPubSubProxy.class);
 
 	@PersistenceContext(unitName="deliveryManager")
 	private EntityManager em;
@@ -82,7 +82,7 @@ public class PubSubProxy implements IPubSubProxy{
 		send(prom, facetAddInfo);
 		
 //		set initial renew
-		PubSubPromotionExtraInfo promExtraInfo = new PubSubPromotionExtraInfo();
+		SecPubSubPromotionExtraInfo promExtraInfo = new SecPubSubPromotionExtraInfo();
 		promExtraInfo.setTimeout(iLease.getInitialRenew());
 		prom.setExtraInfo(promExtraInfo);
 		promExtraInfo.setProm(prom);
@@ -118,7 +118,7 @@ public class PubSubProxy implements IPubSubProxy{
 		send(prom, serv);
 		
 		//set initial renew
-		PubSubPromotionExtraInfo promExtraInfo = new PubSubPromotionExtraInfo();
+		SecPubSubPromotionExtraInfo promExtraInfo = new SecPubSubPromotionExtraInfo();
 		promExtraInfo.setTimeout(iLease.getInitialRenew());
 		promExtraInfo.setProm(prom);
 		prom.setExtraInfo(promExtraInfo);
@@ -179,7 +179,7 @@ public class PubSubProxy implements IPubSubProxy{
 		FederationExtraInfo info=federation.getExtraInfo();
 		if (info == null) {
 			log.debug("Creating Extra information for the federation with id " + federation.getId());
-			PubSubFederationExtraInfo fedExtraInfo = new PubSubFederationExtraInfo(federationFilter);			
+			SecPubSubFederationExtraInfo fedExtraInfo = new SecPubSubFederationExtraInfo(federationFilter);			
 			
 			federation.setExtraInfo(fedExtraInfo);			
 			fedExtraInfo.setFederation(federation); 
@@ -192,7 +192,7 @@ public class PubSubProxy implements IPubSubProxy{
 		MBeanServer server = MBeanServerLocator.locate();
 
 		try {
-			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
+			ISecPubSubProxyMBean pubSubMBean =(ISecPubSubProxyMBean)MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
 			pubSubMBean.subscribe(federationFilter);					
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
@@ -202,8 +202,8 @@ public class PubSubProxy implements IPubSubProxy{
 	public void leave(FederationEnt federation) {
 		MBeanServer server = MBeanServerLocator.locate();
 		try {
-			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
-			pubSubMBean.unsubscribe(((PubSubFederationExtraInfo)federation.getExtraInfo()).getFederationFilter());					
+			ISecPubSubProxyMBean pubSubMBean =(ISecPubSubProxyMBean)MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
+			pubSubMBean.unsubscribe(((SecPubSubFederationExtraInfo)federation.getExtraInfo()).getFederationFilter());					
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
 		}	  
@@ -215,7 +215,7 @@ public class PubSubProxy implements IPubSubProxy{
 	}
 	
 	public void send(FederatedPromotion fedPromotion, FacetAddInfo facetAddInfo){
-		PubSubPromotionExtraInfo promExtraInfo = new PubSubPromotionExtraInfo();
+		SecPubSubPromotionExtraInfo promExtraInfo = new SecPubSubPromotionExtraInfo();
 		promExtraInfo.setTimeout(iLease.getStandardRenew());
 		promExtraInfo.setProm(fedPromotion);
 		fedPromotion.setExtraInfo(promExtraInfo);
@@ -227,7 +227,7 @@ public class PubSubProxy implements IPubSubProxy{
 		// lookup federation coordination manager and refresh
 		MBeanServer server = MBeanServerLocator.locate();
 		try {
-			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
+			ISecPubSubProxyMBean pubSubMBean =(ISecPubSubProxyMBean)MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
 			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), facetAddInfo));
 			
 		} catch (MalformedObjectNameException e) {			
@@ -239,7 +239,7 @@ public class PubSubProxy implements IPubSubProxy{
 	public void send(FederatedPromotion fedPromotion, DService dService) {
 		
 		//set standard renew
-		PubSubPromotionExtraInfo promExtraInfo = new PubSubPromotionExtraInfo();
+		SecPubSubPromotionExtraInfo promExtraInfo = new SecPubSubPromotionExtraInfo();
 		promExtraInfo.setTimeout(iLease.getStandardRenew());
 		promExtraInfo.setProm(fedPromotion);
 		fedPromotion.setExtraInfo(promExtraInfo);
@@ -252,7 +252,7 @@ public class PubSubProxy implements IPubSubProxy{
 		MBeanServer server = MBeanServerLocator.locate();
 
 		try {
-			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
+			ISecPubSubProxyMBean pubSubMBean =(ISecPubSubProxyMBean)MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
 			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), dService));
 			if(fedPromotion.isShareAll()){
 //				add additional facets
@@ -277,7 +277,7 @@ public class PubSubProxy implements IPubSubProxy{
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see eu.secse.deliveryManager.federations.pubsubscribe.core.IPubSubProxy#received(java.lang.String, eu.secse.deliveryManager.model.DService)
+	 * @see eu.secse.deliveryManager.federations.securepubsubscribe.core.IPubSubProxy#received(java.lang.String, eu.secse.deliveryManager.model.DService)
 	 */
 	public void received(String federationId, DService federatedService) {
 		
@@ -322,7 +322,7 @@ public class PubSubProxy implements IPubSubProxy{
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see eu.secse.deliveryManager.federations.pubsubscribe.core.IPubSubProxy#received(java.lang.String, eu.secse.deliveryManager.model.DService)
+	 * @see eu.secse.deliveryManager.federations.securepubsubscribe.core.IPubSubProxy#received(java.lang.String, eu.secse.deliveryManager.model.DService)
 	 */
 	public void received(String federationId, FacetAddInfo federatedFacetSpec) {
 		//controls if it can find FederationEnt
@@ -348,7 +348,7 @@ public class PubSubProxy implements IPubSubProxy{
 		MBeanServer server = MBeanServerLocator.locate();
 
 		try {
-			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
+			ISecPubSubProxyMBean pubSubMBean =(ISecPubSubProxyMBean)MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
 			pubSubMBean.subscribe(federationFilter);					
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
@@ -358,9 +358,9 @@ public class PubSubProxy implements IPubSubProxy{
 	
 	
 	private void addExtraInfo(FederatedElement fedElem, Date lease) {
-		PubSubFedElemExtraInfo fedElemExtraInfo = (PubSubFedElemExtraInfo)fedElem.getExtraInfo();
+		SecPubSubFedElemExtraInfo fedElemExtraInfo = (SecPubSubFedElemExtraInfo)fedElem.getExtraInfo();
 		if(fedElemExtraInfo == null) {
-			fedElemExtraInfo = new PubSubFedElemExtraInfo();
+			fedElemExtraInfo = new SecPubSubFedElemExtraInfo();
 			fedElemExtraInfo.setTimeout(lease);
 			fedElem.setExtraInfo(fedElemExtraInfo);
 			fedElemExtraInfo.setElem(fedElem);
@@ -384,5 +384,23 @@ public class PubSubProxy implements IPubSubProxy{
 		em.flush();
 	}
 
+	public void removeReadingPermission(SecureFederationUser user) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void removeWritingPermission(SecureFederationUser user) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	public void allowWritingPermission(SecureFederationUser user) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void allowReadingPermission(SecureFederationUser user) {
+		// TODO Auto-generated method stub
+		
+	}
 }
