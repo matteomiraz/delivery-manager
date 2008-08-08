@@ -18,7 +18,7 @@ import javax.persistence.Query;
 	@NamedQuery(name=SecureFederationUser.FIND_USER, query="FROM SecureFederationUser WHERE federation=:federation AND userKey=:userKey"),
 	@NamedQuery(name=SecureFederationUser.GET_ALL, query="FROM SecureFederationUser WHERE (:ignoreFederation OR federation=:federation) " +
 			"AND (:ignoreWantsRead OR wantsRead=:wantsRead) AND (:ignoreRead OR read=:read) AND (:ignoreWantsWrite OR wantsWrite=:wantsWrite) " +
-			"AND (:ignoreWrite OR write=:write) AND (:ignoreBanned OR banned=:banned)")
+			"AND (:ignoreWrite OR write=:write) AND (:ignoreCannotWrite OR cannotWrite=:cannotWrite) AND (:ignoreBanned OR banned=:banned)")
 })
 public class SecureFederationUser {
 	static final String FIND_USER = "SecureFederationUser-FIND_USER";
@@ -41,7 +41,7 @@ public class SecureFederationUser {
 	@Lob
 	private X509Certificate certificate;
 	
-	private boolean canRead, canWrite, banned;
+	private boolean canRead, canWrite, cannotWrite, banned;
 	private boolean wantsRead, wantsWrite;
 	
 	SecureFederationUser() { }
@@ -88,6 +88,14 @@ public class SecureFederationUser {
 	public void setCanWrite(boolean canWrite) {
 		this.canWrite = canWrite;
 	}
+
+	public boolean isCannotWrite() {
+		return cannotWrite;
+	}
+	
+	public void setCannotWrite(boolean cannotWrite) {
+		this.cannotWrite = cannotWrite;
+	}
 	
 	public boolean isBanned() {
 		return banned;
@@ -118,7 +126,7 @@ public class SecureFederationUser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Collection<SecureFederationUser> getAll(EntityManager em, String federationId, Boolean wantsRead, Boolean read, Boolean wantsWrite, Boolean write, Boolean banned) {
+	public static Collection<SecureFederationUser> getAll(EntityManager em, String federationId, Boolean wantsRead, Boolean read, Boolean wantsWrite, Boolean write, Boolean cannotWrite, Boolean banned) {
 		Query query = em.createNamedQuery(SecureFederationUser.GET_ALL);
 
 		if(federationId == null) query.setParameter("ignoreFederation", true).setParameter("federation", "nessuna");
@@ -136,10 +144,12 @@ public class SecureFederationUser {
 		if(write == null) query.setParameter("ignoreWrite", true).setParameter("write", true);
 		else query.setParameter("ignoreWrite", false).setParameter("write", write);
 
+		if(cannotWrite == null) query.setParameter("ignoreCannotWrite", true).setParameter("cannotWrite", true);
+		else query.setParameter("ignoreCannotWrite", false).setParameter("cannotWrite", cannotWrite);
+
 		if(banned == null) query.setParameter("ignoreBanned", true).setParameter("banned", true);
 		else query.setParameter("ignoreBanned", false).setParameter("banned", banned);
 
 		return (Collection<SecureFederationUser>) query.getResultList();
 	}
-
 }
