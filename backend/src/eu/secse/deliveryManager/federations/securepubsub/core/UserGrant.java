@@ -42,7 +42,7 @@ public class UserGrant implements IUserGrant {
 	
 	@WebMethod @WebResult(name="PendingRequests")
 	public Collection<UserRequest> getJoinedRequests(@WebParam(name="federationId")String federationId) {
-		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, true, false, null, null, false);
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, true, false, null, null, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
 		for (SecureFederationUser e : req)
@@ -67,7 +67,7 @@ public class UserGrant implements IUserGrant {
 	
 	@WebMethod  @WebResult(name="members")
 	public Collection<UserRequest> listMembers(@WebParam(name="federationId")String federationId) {
-		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, null, null);
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, null, null, null);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
 		for (SecureFederationUser e : req)
@@ -132,7 +132,7 @@ public class UserGrant implements IUserGrant {
 	
 	@WebMethod @WebResult(name="bannedUsers")
 	public Collection<UserRequest> listBannedUsers(@WebParam(name="federationId")String federationId) {
-		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, null, null, null, true);
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, true);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
 		for (SecureFederationUser e : req)
@@ -177,7 +177,7 @@ public class UserGrant implements IUserGrant {
 
 	@WebMethod @WebResult(name="PendingRequests")
 	public Collection<UserRequest> getWritingRequests(@WebParam(name="federationId")String federationId) {
-		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, true, false, false);
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, true, false, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
 		for (SecureFederationUser e : req)
@@ -191,6 +191,8 @@ public class UserGrant implements IUserGrant {
 		SecureFederationUser user = em.find(SecureFederationUser.class, id);
 		
 		if(user == null) throw new NoSuchElementException("The request with id " + id + " doesn't exist!");
+
+		if(user.isCannotWrite()) throw new IllegalStateException("The selected user has the writing permission revoked.");
 		
 		if(user.isWantsWrite()) {
 			user.setWantsWrite(false);
@@ -202,7 +204,7 @@ public class UserGrant implements IUserGrant {
 	
 	@WebMethod  @WebResult(name="writingMembers")
 	public Collection<UserRequest> listWritingMembers(@WebParam(name="federationId")String federationId) {
-		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, true, false);
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, true, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
 		for (SecureFederationUser e : req)
@@ -230,12 +232,38 @@ public class UserGrant implements IUserGrant {
 		
 		if(user.isCanWrite()) {
 			user.setCanWrite(false);
+			user.setCannotWrite(true);
 			secureProxy.removeWritingPermission(user);
 		}
 	}
 	
-
+	@WebMethod @WebResult(name="RevokedWritingPermissions")
+	public Collection<UserRequest> getRevokedWritingPermissions(@WebParam(name="federationId")String federationId) {
+		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, null, null, null, true, null);
+		Collection<UserRequest> ret = new ArrayList<UserRequest>();
+		
+		for (SecureFederationUser e : req)
+			ret.add(new UserRequest(e.getId(), e.getFederation(), e.getName(), e.getCertificate()));
+		
+		return ret;
+	}
 	
+	@WebMethod
+	public void discardWritingRevoke(@WebParam(name="permissionId") long id) {
+		SecureFederationUser user = em.find(SecureFederationUser.class, id);
+		
+		if(user == null) throw new NoSuchElementException("The request with id " + id + " doesn't exist!");
+		
+		if(user.isCannotWrite())
+			user.setCannotWrite(false);
+	}
+
+	public void discardFederation(String federationId) {
+		Collection<SecureFederationUser> users = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, null);			
+		
+		for (SecureFederationUser u : users)
+			em.remove(u);
+	}
 }
 
 

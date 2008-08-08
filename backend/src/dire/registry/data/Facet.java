@@ -10,6 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
+import dire.registry.Signature;
+
 @Entity
 @NamedQueries(value={
 		@NamedQuery(name=Facet.BY_SCHEMA_ID, query="FROM Facet WHERE schemaId = :schemaId"),
@@ -44,6 +46,9 @@ public class Facet {
 	private String xmlName;
 	@Lob private String xmlDocument;
 	private String xmlTimestamp;
+	
+	@Lob
+	private Signature signature;
 	
 	public Facet() { }
 
@@ -133,6 +138,14 @@ public class Facet {
 
 	public Service getService() {
 		return service;
+	}
+
+	public void setSignature(Signature signature) {
+		this.signature = signature;
+	}
+	
+	public Signature getSignature() {
+		return signature;
 	}
 	
 	@Override

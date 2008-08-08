@@ -34,4 +34,10 @@ public interface IRegistry {
 	public String getServiceIdByFacetId(String facetId) throws RemoteException;
 	public Collection<FacetWS> getFacetSpecXSDs(String serviceID) throws RemoteException;
 	public Collection<FacetWS> getFacetAddInfoXSDs(String serviceID) throws RemoteException;
+	
+	public void setServiceSignature(String username, String password, String serviceID, Signature signature) throws RemoteException, AuthenticationException;
+	public Signature getServiceSignature(String serviceID) throws RemoteException;
+
+	public void setFacetAddInfoSignature(String username, String password, String serviceID, String xsdId, Signature signature) throws AuthenticationException, RemoteException;
+	public Signature getFacetAddInfoSignature(String serviceID, String xsdId) throws RemoteException;
 }

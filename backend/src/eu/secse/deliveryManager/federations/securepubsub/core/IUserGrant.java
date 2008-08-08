@@ -12,6 +12,8 @@ public interface IUserGrant {
 	
 	public void receivedWriteRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate);
 	public void discardWritePermissions(String federationId, PublicKey userKey);
+	
+	public void discardFederation(String federationId);
 }
 
 

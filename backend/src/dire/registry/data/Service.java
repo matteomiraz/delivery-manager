@@ -7,10 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Query;
+
+import dire.registry.Signature;
 
 @Entity
 @NamedQuery(name=Service.GET_BY_ID, query="FROM Service WHERE fullId = :id")
@@ -41,6 +44,9 @@ public class Service {
 	@OneToMany(mappedBy="service")
 	private Collection<Facet> facets;
 
+	@Lob
+	private Signature signature;
+	
 	public Service() { }
 
 	public Service(String fullId, User provider, String name, String timestamp, boolean allowAdditionalInformation, String version, String previousVersionId) {
@@ -119,5 +125,13 @@ public class Service {
 		Query q = em.createNamedQuery(Service.GET_BY_ID);
 		q.setParameter("id", id);
 		return (Service) q.getSingleResult();
+	}
+
+	public Signature getSignature() {
+		return signature;
+	}
+	
+	public void setSignature(Signature signature) {
+		this.signature = signature;
 	}
 }
