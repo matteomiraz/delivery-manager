@@ -18,7 +18,6 @@
 
 package eu.secse.deliveryManager.federations.securepubsub.data;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,6 +30,8 @@ import javax.persistence.OneToMany;
 
 import eu.secse.deliveryManager.data.FederationExtraInfo;
 import eu.secse.deliveryManager.reds.InterestEnvelope;
+import java.security.Key;
+import java.security.cert.X509Certificate;
 
 /**
  * This entity has to be inserted in delivery-directory/META-INF/persistence.xml
@@ -48,6 +49,9 @@ public class SecPubSubFederationExtraInfo extends FederationExtraInfo{
 	private Map<Long, SecPubSubKey> keys;
 	
 	private long lastKeyVersion;
+        
+        @Lob
+        private X509Certificate federationCertificate;
 	
 	public SecPubSubFederationExtraInfo() {
 		super();		
@@ -65,7 +69,7 @@ public class SecPubSubFederationExtraInfo extends FederationExtraInfo{
 		this.federationFilter = federationFilter;
 	}
 
-	public void addKey(EntityManager em, Serializable key, long version) {
+	public void addKey(EntityManager em, Key key, long version) {
 		if(version > this.lastKeyVersion) this.lastKeyVersion = version;
 		
 		SecPubSubKey secPubSubKey = new SecPubSubKey(version, key);
@@ -74,13 +78,25 @@ public class SecPubSubFederationExtraInfo extends FederationExtraInfo{
 		keys.put(version, secPubSubKey);
 	}
 	
-	public Serializable getLastKey() {
+	public Key getLastKey() {
 		return keys.get(this.lastKeyVersion).getKey();
 	}
 
-	public Serializable getKey(long version) {
+	public Key getKey(long version) {
 		return keys.get(version).getKey();
 	}
+        
+        public void setCertificate(X509Certificate federationCertificate){
+            this.federationCertificate = federationCertificate;
+        }
+        
+        public X509Certificate getCertificate(){
+            return federationCertificate;
+        }
+        
+        public long getLastKeyVersion(){
+            return lastKeyVersion;
+        }
 
 	@SuppressWarnings("unchecked")
 	public static Collection<SecPubSubFederationExtraInfo> getAll(EntityManager em){

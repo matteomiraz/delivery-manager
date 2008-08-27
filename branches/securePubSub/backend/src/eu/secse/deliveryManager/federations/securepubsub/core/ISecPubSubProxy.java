@@ -18,6 +18,10 @@
 
 package eu.secse.deliveryManager.federations.securepubsub.core;
 
+import eu.secse.deliveryManager.model.DFederation;
+import eu.secse.deliveryManager.model.DirectMessage;
+import eu.secse.deliveryManager.model.MetaData;
+import java.util.Collection;
 import javax.ejb.Local;
 
 import eu.secse.deliveryManager.core.FederationProxy;
@@ -27,6 +31,10 @@ import eu.secse.deliveryManager.model.FacetAddInfo;
 
 @Local
 public interface ISecPubSubProxy extends FederationProxy{
+
+    public void received(DirectMessage directMessage, Collection<MetaData> metadata);
+
+    public void received(String federationId, DFederation dfed, Collection<MetaData> metadata);
 
 	public void send(FederatedPromotion fedPromotion, DService dService);
 	public void send(FederatedPromotion fedPromotion, FacetAddInfo dFacet);

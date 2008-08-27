@@ -32,7 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.secse.deliveryManager.federations.pubsubscribe.core.IPubSubProxy;
-import eu.secse.deliveryManager.model.DFederation;
+import eu.secse.deliveryManager.model.DFederationPlainMessage;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.model.FacetAddInfo;
@@ -60,8 +60,8 @@ public class PubSubJmsListener implements MessageListener {
 				if (obj instanceof Envelope) {
 					Deliverable deliverable = ((Envelope) obj).getObject();
 					
-					if(deliverable instanceof DFederation) {
-						DFederation dfed = (DFederation) deliverable;
+					if(deliverable instanceof DFederationPlainMessage) {
+						DFederationPlainMessage dfed = (DFederationPlainMessage) deliverable;
 						log.info("Received "+dfed.getObject().getClass().getSimpleName());
 						if(dfed.getObject() instanceof DService)
 							

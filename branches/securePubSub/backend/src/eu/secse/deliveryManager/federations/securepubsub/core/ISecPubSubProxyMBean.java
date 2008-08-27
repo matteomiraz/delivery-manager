@@ -18,6 +18,9 @@
 
 package eu.secse.deliveryManager.federations.securepubsub.core;
 
+import java.security.PublicKey;
+import java.security.cert.CertPath;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import javax.ejb.EJBException;
@@ -27,10 +30,29 @@ import org.jboss.annotation.ejb.Management;
 
 import polimi.reds.ComparableFilter;
 import eu.secse.deliveryManager.model.Deliverable;
+import eu.secse.deliveryManager.model.MetaData;
+import java.security.PrivateKey;
+import java.util.Collection;
 
 
 @Management
 public interface ISecPubSubProxyMBean {
+    
+    public String getCRLDistPointBaseURL();
+
+    public int getCertificateValidityDays();
+
+    public CertPath getCertificationPath();
+
+    public String getHashAlgorithm();
+
+    public PrivateKey getPrivateKey();
+
+    public PublicKey getPublicKey();
+
+    public String getSimmetricAlgorithm();
+
+    public Collection<X509Certificate> getTrustedCA();
 //	Life cycle methods
 	public void start();
 	public void stop();
@@ -48,6 +70,8 @@ public interface ISecPubSubProxyMBean {
 	public void unsubscribe(ComparableFilter filter);
 	
 	public void publish(Deliverable message);
+        public void publish(Deliverable message, MetaData metadata);
+        public void publish(Deliverable message, Collection<MetaData> metadata);
 	
 	public Date getNextExpire() throws IllegalStateException, NoSuchObjectLocalException, EJBException;
 	
