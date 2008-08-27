@@ -1,6 +1,7 @@
 package eu.secse.deliveryManager.federations.securepubsub.core;
 
 import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +42,7 @@ public class UserGrant implements IUserGrant {
 	}
 	
 	@WebMethod @WebResult(name="PendingRequests")
-	public Collection<UserRequest> getJoinedRequests(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> getJoinedRequests(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, true, false, null, null, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -66,7 +67,7 @@ public class UserGrant implements IUserGrant {
 	}
 	
 	@WebMethod  @WebResult(name="members")
-	public Collection<UserRequest> listMembers(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> listMembers(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, null, null, null);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -131,7 +132,7 @@ public class UserGrant implements IUserGrant {
 	}
 	
 	@WebMethod @WebResult(name="bannedUsers")
-	public Collection<UserRequest> listBannedUsers(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> listBannedUsers(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, true);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -176,7 +177,7 @@ public class UserGrant implements IUserGrant {
 	}
 
 	@WebMethod @WebResult(name="PendingRequests")
-	public Collection<UserRequest> getWritingRequests(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> getWritingRequests(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, true, false, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -203,7 +204,7 @@ public class UserGrant implements IUserGrant {
 	}
 	
 	@WebMethod  @WebResult(name="writingMembers")
-	public Collection<UserRequest> listWritingMembers(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> listWritingMembers(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, true, null, true, null, false);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -238,7 +239,7 @@ public class UserGrant implements IUserGrant {
 	}
 	
 	@WebMethod @WebResult(name="RevokedWritingPermissions")
-	public Collection<UserRequest> getRevokedWritingPermissions(@WebParam(name="federationId")String federationId) {
+	public Collection<UserRequest> getRevokedWritingPermissions(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, null, null, null, null, true, null);
 		Collection<UserRequest> ret = new ArrayList<UserRequest>();
 		
@@ -271,15 +272,17 @@ class UserRequest {
 	long id;
 	String userName;
 	String federationId;
-	private X509Certificate certificate;
-
-	public UserRequest(long id, String federationId, String userName, X509Certificate certificate) {
+	private byte[] certificate;
+	
+	public UserRequest(long id, String federationId, String userName, X509Certificate certificate) throws CertificateEncodingException {
 		this.id = id;
 		this.federationId = federationId;
 		this.userName = userName;
-		this.certificate = certificate;
+		this.certificate = certificate.getEncoded();
 	}
-	
+
+	UserRequest() { }
+
 	public long getId() {
 		return id;
 	}
@@ -292,7 +295,23 @@ class UserRequest {
 		return federationId;
 	}
 	
-	public X509Certificate getCertificate() {
+	public byte[] getCertificate() {
 		return certificate;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public void setFederationId(String federationId) {
+		this.federationId = federationId;
+	}
+
+	public void setCertificate(byte[] certificate) {
+		this.certificate = certificate;
 	}
 }
