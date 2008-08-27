@@ -2,6 +2,7 @@ package eu.secse.deliveryManager.federations.securepubsub.data;
 
 import java.io.Serializable;
 
+import java.security.Key;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,13 +18,13 @@ public class SecPubSubKey {
 	private long version;
 	
 	@Lob
-	private Serializable key;
+	private Key federationKey;
 
 	SecPubSubKey() { }
 
-	public SecPubSubKey(long version, Serializable key) {
+	public SecPubSubKey(long version, Key federationKey) {
 		this.version = version;
-		this.key = key;
+		this.federationKey = federationKey;
 	}
 	
 	public long getId() {
@@ -34,8 +35,8 @@ public class SecPubSubKey {
 		return version;
 	}
 
-	public Serializable getKey() {
-		return key;
+	public Key getKey() {
+		return federationKey;
 	}
 	
 	

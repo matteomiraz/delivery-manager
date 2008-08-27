@@ -53,7 +53,7 @@ import eu.secse.deliveryManager.federations.pubSubRep.reds.PSRDeletion;
 import eu.secse.deliveryManager.federations.pubSubRep.reds.PSRQuery;
 import eu.secse.deliveryManager.federations.pubSubRep.reds.PSRResponse;
 import eu.secse.deliveryManager.interest.InterestFederation;
-import eu.secse.deliveryManager.model.DFederation;
+import eu.secse.deliveryManager.model.DFederationPlainMessage;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.model.FacetAddInfo;
@@ -187,7 +187,7 @@ public class PsrProxy implements IPsrProxy{
 			pubSubMBean.subscribe(federationFilter);
 			
 			// send the query
-			pubSubMBean.publishRepliable(new DFederation(federation.getId(), new PSRQuery()));
+			pubSubMBean.publishRepliable(new DFederationPlainMessage(federation.getId(), new PSRQuery()));
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
 		}	
@@ -212,7 +212,7 @@ public class PsrProxy implements IPsrProxy{
 		MBeanServer server = MBeanServerLocator.locate();
 		try {
 			IPsrMBean pubSubMBean =(IPsrMBean)MBeanProxyExt.create(IPsrMBean.class, "DeliveryManager:service=pubSubRepFederationProxy", server);			
-			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), facetAddInfo));
+			pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), facetAddInfo));
 			
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
@@ -226,7 +226,7 @@ public class PsrProxy implements IPsrProxy{
 
 		try {
 			IPsrMBean pubSubMBean =(IPsrMBean)MBeanProxyExt.create(IPsrMBean.class, "DeliveryManager:service=pubSubRepFederationProxy", server);			
-			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), dService));
+			pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), dService));
 			
 			if(fedPromotion.isShareAll()){
 //				add additional facets
@@ -234,7 +234,7 @@ public class PsrProxy implements IPsrProxy{
 				Collection<FacetAddInfo> facetAddInfo = modelManager.getFacetAdditionalInfo(dService.getServiceID());
 				if(facetAddInfo!=null){
 					for (FacetAddInfo s : facetAddInfo) {
-						pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), s));
+						pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), s));
 					}
 				}
 			}
@@ -387,7 +387,7 @@ public class PsrProxy implements IPsrProxy{
 			MBeanServer server = MBeanServerLocator.locate();
 			IPsrMBean pubSubMBean =(IPsrMBean)MBeanProxyExt.create(IPsrMBean.class, "DeliveryManager:service=pubSubRepFederationProxy", server);			
 
-			pubSubMBean.reply(new Envelope(new DFederation(federationId,resp)), messageID);
+			pubSubMBean.reply(new Envelope(new DFederationPlainMessage(federationId,resp)), messageID);
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
 		}	  

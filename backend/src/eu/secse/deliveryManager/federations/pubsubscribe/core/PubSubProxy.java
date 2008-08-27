@@ -52,7 +52,7 @@ import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubFedElemExtra
 import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubFederationExtraInfo;
 import eu.secse.deliveryManager.federations.pubsubscribe.data.PubSubPromotionExtraInfo;
 import eu.secse.deliveryManager.interest.InterestFederation;
-import eu.secse.deliveryManager.model.DFederation;
+import eu.secse.deliveryManager.model.DFederationPlainMessage;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.FacetSpec;
@@ -228,7 +228,7 @@ public class PubSubProxy implements IPubSubProxy{
 		MBeanServer server = MBeanServerLocator.locate();
 		try {
 			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
-			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), facetAddInfo));
+			pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), facetAddInfo));
 			
 		} catch (MalformedObjectNameException e) {			
 			log.error(e.getMessage());	      		    
@@ -253,7 +253,7 @@ public class PubSubProxy implements IPubSubProxy{
 
 		try {
 			IPubSubProxyMBean pubSubMBean =(IPubSubProxyMBean)MBeanProxyExt.create(IPubSubProxyMBean.class, "DeliveryManager:service=pubSubFederationProxy", server);			
-			pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), dService));
+			pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), dService));
 			if(fedPromotion.isShareAll()){
 //				add additional facets
 				log.info("Sending Additional Facet for service "+dService.getServiceID());
@@ -261,7 +261,7 @@ public class PubSubProxy implements IPubSubProxy{
 				if(facetAddInfo!=null){
 				for (FacetAddInfo s : facetAddInfo) {
 					s.setInfo(iLease.getLease(fedPromotion.getElement()));
-					pubSubMBean.publish(new DFederation(fedPromotion.getFederation().getId(), s));
+					pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), s));
 				}
 				}
 			}
@@ -383,6 +383,4 @@ public class PubSubProxy implements IPubSubProxy{
 
 		em.flush();
 	}
-
-
 }
