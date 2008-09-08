@@ -24,23 +24,7 @@ public class UserGrant implements IUserGrant {
 	protected EntityManager em;
 
 	@EJB ISecPubSubProxy secureProxy;
-	
-	public void receivedReadRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isBanned()) return;
-			if(user.isCanRead()) {
-				secureProxy.allowReadingPermission(user);
-				return;
-			}
-		} else {
-			user = new SecureFederationUser(name, federationId, userKey, certificate);
-			em.persist(user);
-		}
-		
-		user.setWantsRead(true);
-	}
-	
+        
 	@WebMethod @WebResult(name="PendingRequests")
 	public Collection<UserRequest> getJoinedRequests(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
 		Collection<SecureFederationUser> req = SecureFederationUser.getAll(em, federationId, true, false, null, null, null, false);
@@ -76,23 +60,7 @@ public class UserGrant implements IUserGrant {
 		
 		return ret;
 	}
-	
-	/** The user doesn't wants to receive the federation's messages anymore... notice that is the user that wants to quit (he is not banned!) */
-	public void discardReadPermissions(String federationId, PublicKey userKey) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isCanWrite()) {
-				user.setCanWrite(false);
-				secureProxy.removeWritingPermission(user);
-			}
-
-			if(user.isCanRead()) {
-				user.setCanRead(false);
-				secureProxy.removeReadingPermission(user);
-			}
-		}
-	}
-	
+        
 	@WebMethod
 	public void banUser(@WebParam(name="permissionId") long id) {
 		SecureFederationUser user = em.find(SecureFederationUser.class, id);
@@ -158,23 +126,6 @@ public class UserGrant implements IUserGrant {
 			throw new NoSuchElementException("The user with id " + id + " is not banned!");
 
 	}
-	
-	public void receivedWriteRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isBanned()) return;
-			if(user.isCanWrite()) {
-				secureProxy.allowWritingPermission(user);
-				return;
-			}
-		} else {
-			user = new SecureFederationUser(name, federationId, userKey, certificate);
-			user.setWantsRead(true);
-			em.persist(user);
-		}
-		
-		user.setWantsWrite(true);
-	}
 
 	@WebMethod @WebResult(name="PendingRequests")
 	public Collection<UserRequest> getWritingRequests(@WebParam(name="federationId")String federationId) throws CertificateEncodingException {
@@ -214,17 +165,6 @@ public class UserGrant implements IUserGrant {
 		return ret;
 	}
 	
-	/** The user doesn't wants to send messages to this federation... */
-	public void discardWritePermissions(String federationId, PublicKey userKey) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isCanWrite()) {
-				user.setCanWrite(false);
-				secureProxy.removeWritingPermission(user);
-			}
-		}
-	}
-	
 	@WebMethod
 	public void revokeWritePermissions(@WebParam(name="permissionId") long id) {
 		SecureFederationUser user = em.find(SecureFederationUser.class, id);
@@ -258,13 +198,7 @@ public class UserGrant implements IUserGrant {
 		if(user.isCannotWrite())
 			user.setCannotWrite(false);
 	}
-
-	public void discardFederation(String federationId) {
-		Collection<SecureFederationUser> users = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, null);			
-		
-		for (SecureFederationUser u : users)
-			em.remove(u);
-	}
+        
 }
 
 
