@@ -117,8 +117,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     private ILeaseManager iLease;
     @EJB
     private ModelManager modelManager;
-    @EJB
-    private IUserGrant userGrant;
 
     public void addFacetAddInfo(FederatedPromotion prom, FacetAddInfo facetAddInfo) {
         // publishes the  DFederationMessage with FacetAddInfo
@@ -306,8 +304,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             DFederationEncryptedMessage message =
                     new DFederationEncryptedMessage(fedPromotion.getFederation().getId(),
                     facetAddInfo, null,//Insert metadata
-                    ((SecPubSubFederationExtraInfo)fedPromotion.getFederation().getExtraInfo()).getLastKey(),
-                    ((SecPubSubFederationExtraInfo)fedPromotion.getFederation().getExtraInfo()).getLastKeyVersion());
+                    ((SecPubSubFederationExtraInfo) fedPromotion.getFederation().getExtraInfo()).getLastKey(),
+                    ((SecPubSubFederationExtraInfo) fedPromotion.getFederation().getExtraInfo()).getLastKeyVersion());
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchPaddingException ex) {
@@ -350,10 +348,10 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     for (FacetAddInfo s : facetAddInfo) {
                         s.setInfo(iLease.getLease(fedPromotion.getElement()));
                         DFederationEncryptedMessage message =
-                    new DFederationEncryptedMessage(fedPromotion.getFederation().getId(),
-                    dService, null,//Insert metadata
-                    ((SecPubSubFederationExtraInfo)fedPromotion.getFederation().getExtraInfo()).getLastKey(),
-                    ((SecPubSubFederationExtraInfo)fedPromotion.getFederation().getExtraInfo()).getLastKeyVersion());
+                                new DFederationEncryptedMessage(fedPromotion.getFederation().getId(),
+                                dService, null,//Insert metadata
+                                ((SecPubSubFederationExtraInfo) fedPromotion.getFederation().getExtraInfo()).getLastKey(),
+                                ((SecPubSubFederationExtraInfo) fedPromotion.getFederation().getExtraInfo()).getLastKeyVersion());
                     }
                 }
             }
@@ -522,7 +520,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         em.flush();
     }
 
-    //:-)
     public void removeReadingPermission(SecureFederationUser user) {
         //We have to do a rekey
         MBeanServer server = MBeanServerLocator.locate();
@@ -547,10 +544,10 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
             //Sending the reKey message
             DFederationReKey reKeyMessage = null;
-             /*
-                    new DFederationReKey(user.getFederation(), newKey, newKeyVersion,
-                    SecureFederationUser.getAll(em, user.getFederation(), true, true, true, null, null, false)
-            */      
+            /*
+            new DFederationReKey(user.getFederation(), newKey, newKeyVersion,
+            SecureFederationUser.getAll(em, user.getFederation(), true, true, true, null, null, false)
+             */
             MetaDataSignature signature =
                     new MetaDataSignature(reKeyMessage, pubSubMBean.getPrivateKey(),
                     pubSubMBean.getHashAlgorithm() + "With" + pubSubMBean.getPrivateKey().getAlgorithm(),
@@ -567,7 +564,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     }
 
     public void removeWritingPermission(SecureFederationUser user) {
-        
     }
 
     //:-)
@@ -827,25 +823,26 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     log.warn("Not in the federation " + request.getFederationID());
                     return;
                 }
+                
                 switch (request.getReason()) {
                     case JOIN:
-                        userGrant.receivedReadRequest(request.getFederationID(),
+                        receivedReadRequest(request.getFederationID(),
                                 userCertificate.getPublicKey(),
                                 userCertificate.getSubjectDN().getName(),
                                 userCertificate);
                         break;
                     case LEAVE:
-                        userGrant.discardReadPermissions(request.getFederationID(),
+                        discardReadPermissions(request.getFederationID(),
                                 userCertificate.getPublicKey());
                         break;
                     case WRITE:
-                        userGrant.receivedWriteRequest(request.getFederationID(),
+                        receivedWriteRequest(request.getFederationID(),
                                 userCertificate.getPublicKey(),
                                 userCertificate.getSubjectDN().getName(),
                                 userCertificate);
                         break;
                     case NOT_WRITE:
-                        userGrant.discardReadPermissions(request.getFederationID(),
+                        discardWritePermissions(request.getFederationID(),
                                 userCertificate.getPublicKey());
                         break;
 
@@ -853,4 +850,72 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             }
         }
     }
+    
+    	public void receivedReadRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
+		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+		if(user != null) {
+			if(user.isBanned()) return;
+			if(user.isCanRead()) {
+				allowReadingPermission(user);
+				return;
+			}
+		} else {
+			user = new SecureFederationUser(name, federationId, userKey, certificate);
+			em.persist(user);
+		}
+		
+		user.setWantsRead(true);
+	}
+        
+        /** The user doesn't wants to receive the federation's messages anymore... notice that is the user that wants to quit (he is not banned!) */
+	public void discardReadPermissions(String federationId, PublicKey userKey) {
+		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+		if(user != null) {
+			if(user.isCanWrite()) {
+				user.setCanWrite(false);
+				removeWritingPermission(user);
+			}
+
+			if(user.isCanRead()) {
+				user.setCanRead(false);
+				removeReadingPermission(user);
+			}
+		}
+	}
+        
+        	public void receivedWriteRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
+		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+		if(user != null) {
+			if(user.isBanned()) return;
+			if(user.isCanWrite()) {
+				allowWritingPermission(user);
+				return;
+			}
+		} else {
+			user = new SecureFederationUser(name, federationId, userKey, certificate);
+			user.setWantsRead(true);
+			em.persist(user);
+		}
+		
+		user.setWantsWrite(true);
+	}
+                
+                
+	/** The user doesn't wants to send messages to this federation... */
+	public void discardWritePermissions(String federationId, PublicKey userKey) {
+		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+		if(user != null) {
+			if(user.isCanWrite()) {
+				user.setCanWrite(false);
+				removeWritingPermission(user);
+			}
+		}
+	}
+        
+        public void discardFederation(String federationId) {
+		Collection<SecureFederationUser> users = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, null);			
+		
+		for (SecureFederationUser u : users)
+			em.remove(u);
+	}
 }

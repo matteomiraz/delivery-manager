@@ -29,7 +29,7 @@ public interface IPerformanceLoggerMBean {
 	public abstract void log(String s);
 	public abstract void flush();
 
-	public abstract boolean isEnabled();
+	public abstract boolean isLoggingEnabled();
 	public abstract void setEnabled(boolean enabled);
 
 	public abstract String getLogFile();

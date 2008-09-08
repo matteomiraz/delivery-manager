@@ -50,7 +50,7 @@ public class PerformanceLogger implements IPerformanceLogger {
 	}
 	
 	public void log(long timestamp, String property, String elementId) {
-		if(pLogger == null || !pLogger.isEnabled()) return; 
+		if(pLogger == null || !pLogger.isLoggingEnabled()) return; 
 		
 		log.info("Logging " + property);
 		
@@ -60,6 +60,6 @@ public class PerformanceLogger implements IPerformanceLogger {
 	}
 	
 	public boolean isEnabled() {
-		return pLogger.isEnabled();
+		return pLogger.isLoggingEnabled();
 	}
 }
