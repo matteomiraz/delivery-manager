@@ -36,7 +36,7 @@ import eu.secse.deliveryManager.data.FederatedElementExtraInfo;
 		@NamedQuery(name=SecPubSubFedElemExtraInfo.FEDERATED_ELEMENT_EXPIRED, query="SELECT f.elem FROM SecPubSubFedElemExtraInfo AS f WHERE f.timeout < current_timestamp() ")
 })
 public class SecPubSubFedElemExtraInfo extends FederatedElementExtraInfo{
-	public static final String FEDERATED_ELEMENT_EXPIRED = "FederatedElementExpired";
+	public static final String FEDERATED_ELEMENT_EXPIRED = "secureFederatedElementExpired";
 	
 	/** renew or lease of this element */
 	@Temporal(TemporalType.TIMESTAMP)

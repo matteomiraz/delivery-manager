@@ -38,7 +38,7 @@ import eu.secse.deliveryManager.data.FederatedPromotionExtraInfo;
 })
 public class SecPubSubPromotionExtraInfo extends FederatedPromotionExtraInfo {
 	
-	public static final String FEDERATED_ELEMENT_TO_RENEW = "FederatedElementToExpire";
+	public static final String FEDERATED_ELEMENT_TO_RENEW = "secureFederatedElementToExpire";
 	
 	public SecPubSubPromotionExtraInfo(){
 		super();
