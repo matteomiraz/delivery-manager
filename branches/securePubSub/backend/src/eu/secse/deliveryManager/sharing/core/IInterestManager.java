@@ -97,7 +97,4 @@ public interface IInterestManager {
 	 */
 	void unsubscribe(Interest interest) throws NotSubscribedException;
 
-	void subscribeAll(String description);
-	
-	
 }
