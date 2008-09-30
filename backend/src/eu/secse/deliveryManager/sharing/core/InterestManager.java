@@ -18,8 +18,6 @@
 
 package eu.secse.deliveryManager.sharing.core;
 
-import java.util.Collection;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -37,7 +35,6 @@ import eu.secse.deliveryManager.interest.InterestService;
 import eu.secse.deliveryManager.interest.MultipleInterestSpecificationFacet;
 import eu.secse.deliveryManager.reds.InterestEnvelope;
 import eu.secse.deliveryManager.registry.IRegistryProxy;
-import eu.secse.deliveryManager.sharing.data.filters.InterestEnt;
 import eu.secse.deliveryManager.sharing.data.filters.InterestFacetEnt;
 import eu.secse.deliveryManager.sharing.data.filters.InterestServiceEnt;
 import eu.secse.deliveryManager.sharing.data.filters.InterestFacetEnt.FacetInterestType;
@@ -69,35 +66,6 @@ public class InterestManager implements IInterestManager {
 		InterestAdditionalInformationId i = new InterestAdditionalInformationId(serviceId, facetSchemaId);
 		redsManager.subscribe(new InterestEnvelope(i, registry.getRegistryId()));
 		em.persist(new InterestFacetEnt(FacetInterestType.additionalInformationFacetById, serviceId, facetSchemaId, null, description));
-	}
-
-	public void subscribeAll(String description) {
-		log.info("Resubscribing to Service and facet filters");
-		Collection<InterestEnt> interests = InterestEnt.getAllInterests(em);
-		for(InterestEnt i: interests){
-			if (i instanceof InterestServiceEnt) 
-				subscribeService(((InterestServiceEnt)i).getServiceID(), description);
-			else {
-				if(i instanceof InterestFacetEnt) { 
-					InterestFacetEnt intFacetEnt = (InterestFacetEnt)i;
-					if(intFacetEnt.getType().equals(FacetInterestType.additionalInformationFacet))
-						try{
-							subscribeAdditionalInformationFacet(((InterestFacetEnt)i).getServiceId(),((InterestFacetEnt)i).getFacetInterest()[0], description);
-						}catch(NotSubscribedException ex){
-							log.error(ex.getMessage());
-						}
-						else {
-							if(intFacetEnt.getType().equals(FacetInterestType.additionalInformationFacetById))
-								try{
-
-									subscribeAdditionalInformationFacetById(((InterestFacetEnt)i).getServiceId(),((InterestFacetEnt)i).getFacetSchemaId(), description);
-								}catch(NotSubscribedException ex){
-									log.error(ex.getMessage());
-								}	
-						}
-				} else log.warn("Filter class unknown");
-			}
-		}
 	}
 
 	public void subscribeService(String serviceId, String description) {

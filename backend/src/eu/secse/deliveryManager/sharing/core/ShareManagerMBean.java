@@ -18,14 +18,15 @@
 
 package eu.secse.deliveryManager.sharing.core;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.ejb.NoSuchObjectLocalException;
 import javax.ejb.Timer;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,8 +34,17 @@ import org.jboss.annotation.ejb.Service;
 
 import polimi.reds.ComparableFilter;
 import polimi.reds.LocalDispatchingService;
+import eu.secse.deliveryManager.interest.InterestAdditionalInformation;
+import eu.secse.deliveryManager.interest.InterestAdditionalInformationId;
+import eu.secse.deliveryManager.interest.InterestService;
 import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.reds.Envelope;
+import eu.secse.deliveryManager.reds.InterestEnvelope;
+import eu.secse.deliveryManager.registry.IRegistryProxy;
+import eu.secse.deliveryManager.sharing.data.filters.InterestEnt;
+import eu.secse.deliveryManager.sharing.data.filters.InterestFacetEnt;
+import eu.secse.deliveryManager.sharing.data.filters.InterestServiceEnt;
+import eu.secse.deliveryManager.sharing.data.filters.InterestFacetEnt.FacetInterestType;
 import eu.secse.deliveryManager.sharing.reds.SharingListener;
 import eu.secse.deliveryManager.sharing.timer.ISharingTimers;
 import eu.secse.deliveryManager.utils.IConfiguration;
@@ -56,6 +66,12 @@ public class ShareManagerMBean implements IShareManagerMBean {
 	@EJB IConfiguration conf;
 	
 	@EJB ISharingTimers timersBean;
+	
+	@EJB private IRegistryProxy registry;
+
+	@PersistenceContext(unitName="deliveryManager")
+	protected EntityManager em;
+
 	
 //	 interval between two events (renew or expire)
 	private long STEP;
@@ -116,17 +132,44 @@ public class ShareManagerMBean implements IShareManagerMBean {
 			return;
 		}
 		
-		InitialContext ctx = null;
-		try{
-			ctx = new InitialContext();
-			IInterestManager interestManager = (IInterestManager)ctx.lookup("deliverymanager/InterestManager/local");
-			interestManager.subscribeAll("Precedent subscriptions");
-		} catch(NamingException ex){
-			log.error("InterestManager not found: " + ex.getMessage());
-		}
-		
-		
+		subscribeAll("Precedent subscriptions");
 	}
+	
+	public void subscribeAll(String description) {
+		log.info("Resubscribing to Service and facet filters");
+		Collection<InterestEnt> interests = InterestEnt.getAllInterests(em);
+		for(InterestEnt i: interests){
+			if (i instanceof InterestServiceEnt) {
+				InterestService interestService = new InterestService(((InterestServiceEnt)i).getServiceID());
+				this.subscribe(new InterestEnvelope(interestService, registry.getRegistryId()));
+			} else {
+				if(i instanceof InterestFacetEnt) { 
+					InterestFacetEnt intFacetEnt = (InterestFacetEnt)i;
+					if(intFacetEnt.getType().equals(FacetInterestType.additionalInformationFacet))
+						try{
+
+							InterestAdditionalInformation intAddInfo = new InterestAdditionalInformation(((InterestFacetEnt)i).getServiceId(), ((InterestFacetEnt)i).getFacetInterest()[0].getFacetSchema(), ((InterestFacetEnt)i).getFacetInterest()[0].getXpath());
+							this.subscribe(new InterestEnvelope(intAddInfo, registry.getRegistryId()));
+
+						} catch (Exception ex) {
+							log.error(ex.getMessage());
+						}
+						else {
+							if(intFacetEnt.getType().equals(FacetInterestType.additionalInformationFacetById))
+								try{
+
+									InterestAdditionalInformationId intAddInfoId = new InterestAdditionalInformationId(((InterestFacetEnt)i).getServiceId(), ((InterestFacetEnt)i).getFacetSchemaId());
+									this.subscribe(new InterestEnvelope(intAddInfoId, registry.getRegistryId()));
+
+								} catch (Exception ex) {
+									log.error(ex.getMessage());
+								}	
+						}
+				} else log.warn("Filter class unknown");
+			}
+		}
+	}
+
 
 	public void stop() {
 		log.info("Stopping service shareManager");
