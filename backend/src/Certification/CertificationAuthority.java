@@ -1,17 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Certification;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
@@ -37,33 +31,30 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
-/**
- *
- * @author Mario
- */
 public class CertificationAuthority {
 
     private String name;
-    private KeyPair CAkeys;
-    private X509Certificate CAcertificate;
+    private PublicKey caPublicKey;
+    private PrivateKey caPrivateKey;
     private X509V2CRLGenerator crlGenerator;
     private BigInteger crlNumber;
     private String urlOfCRLDistPoint;
+    private String hashAlgorithm;
 
-    public CertificationAuthority(String name, String urlOfCRLDistPoint) {
+    public CertificationAuthority(String name, String urlOfCRLDistPoint,PublicKey caPublicKey, PrivateKey caPrivateKey,String hashAlgorithm) {
         this.name = name;
         this.urlOfCRLDistPoint = urlOfCRLDistPoint;
-        //Generating a pair of random keys for the CA
-        KeyPairGenerator keyPairGenerator = null;
-        try {
-            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //Setting keys lenght and random seed
-        keyPairGenerator.initialize(1024, new SecureRandom());
-        CAkeys = keyPairGenerator.generateKeyPair();
-
+        this.caPublicKey = caPublicKey;
+        this.caPrivateKey = caPrivateKey;
+        this.hashAlgorithm = hashAlgorithm;
+        //Set-up of CRL generator
+        crlNumber = BigInteger.ZERO;
+        crlGenerator = new X509V2CRLGenerator();
+        crlGenerator.setIssuerDN(new X500Principal("CN=" + name));
+        crlGenerator.setSignatureAlgorithm(hashAlgorithm+"with"+caPublicKey.getAlgorithm());
+    }
+    private X509Certificate generateCACertificate(){
+        X509Certificate CAcertificate;
         //Generating a self-signed certificate
         //Setting up the generator
         X509V3CertificateGenerator generator = new X509V3CertificateGenerator();
@@ -74,20 +65,20 @@ public class CertificationAuthority {
         date.add(Calendar.DAY_OF_YEAR, 365);
         generator.setNotAfter(date.getTime());
         generator.setSubjectDN(new X500Principal("CN=" + name));
-        generator.setPublicKey(CAkeys.getPublic());
-        generator.setSignatureAlgorithm("SHA1withRSA");
+        generator.setPublicKey(caPublicKey);
+        generator.setSignatureAlgorithm(hashAlgorithm+"with"+caPublicKey.getAlgorithm());
         //Adding extensions
         try {
             generator.addExtension(X509Extensions.BasicConstraints, false, new BasicConstraints(true));//Posso fare fino 0 passi per trovare la rootCA
 
-            generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(CAkeys.getPublic()));
+            generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(caPublicKey));
         } catch (CertificateParsingException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
         }
         //Generating the certificate of the CA
         CAcertificate = null;
         try {
-            CAcertificate = generator.generate(CAkeys.getPrivate(), "BC");
+            CAcertificate = generator.generate(caPrivateKey, "BC");
         } catch (CertificateEncodingException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalStateException ex) {
@@ -101,12 +92,7 @@ public class CertificationAuthority {
         } catch (InvalidKeyException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //Set-up of CRL generator
-        crlNumber = BigInteger.ZERO;
-        crlGenerator = new X509V2CRLGenerator();
-        crlGenerator.setIssuerDN(new X500Principal("CN=" + name));
-        crlGenerator.setSignatureAlgorithm("SHA1withRSA");
+        return CAcertificate;
     }
 
     public X509Certificate generateCertificate(String distinguishedName, PublicKey key, int validityDays, boolean intermediate) {
@@ -120,7 +106,7 @@ public class CertificationAuthority {
         generator.setNotAfter(date.getTime());
         generator.setSubjectDN(new X500Principal("CN=" + distinguishedName));
         generator.setPublicKey(key);
-        generator.setSignatureAlgorithm("SHA1withRSA");
+        generator.setSignatureAlgorithm(hashAlgorithm+"with"+caPublicKey.getAlgorithm());
         
         try{
         //Adding extensions
@@ -128,7 +114,7 @@ public class CertificationAuthority {
             generator.addExtension(X509Extensions.BasicConstraints, false, new BasicConstraints(true));
 
         }
-        generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(CAcertificate));
+        generator.addExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(getCertificate()));
         generator.addExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(key));
         } catch (CertificateParsingException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
@@ -144,7 +130,7 @@ public class CertificationAuthority {
         //Generating the certificate
         X509Certificate certificate = null;
         try {
-            certificate = generator.generate(CAkeys.getPrivate(), "BC");
+            certificate = generator.generate(caPrivateKey, "BC");
         } catch (CertificateEncodingException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalStateException ex) {
@@ -162,7 +148,7 @@ public class CertificationAuthority {
     }
 
     public PublicKey getPublicKey() {
-        return CAkeys.getPublic();
+        return caPublicKey;
     }
 
     public String getName() {
@@ -170,7 +156,7 @@ public class CertificationAuthority {
     }
 
     public X509Certificate getCertificate() {
-        return CAcertificate;
+        return generateCACertificate();
     }
 
     public void revokeCetrificate(BigInteger serial) {
@@ -192,7 +178,7 @@ public class CertificationAuthority {
         //Generating CRL         
         X509CRL crl = null;
         try {
-            crl = crlGenerator.generate(CAkeys.getPrivate());
+            crl = crlGenerator.generate(caPrivateKey);
         } catch (CRLException ex) {
             Logger.getLogger(CertificationAuthority.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalStateException ex) {

@@ -8,6 +8,7 @@ package eu.secse.deliveryManager.model;
 import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -38,7 +39,7 @@ public class DirectPlainMessage implements DirectMessage{
         return message;
     }
     
-    public DirectEncryptedMessage encrypt(PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
-        return new DirectEncryptedMessage(publicKey, message);        
+    public DirectEncryptedMessage encrypt(PublicKey publicKey,int simmetricKeySize, String simmetricAlgorithm) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException{
+        return new DirectEncryptedMessage(publicKey, simmetricAlgorithm,simmetricKeySize, message);        
     }
 }

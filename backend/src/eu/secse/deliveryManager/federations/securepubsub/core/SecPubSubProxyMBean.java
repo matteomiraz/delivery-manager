@@ -98,6 +98,7 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
     private String simmetricAlgorithm;
     private String crlDistPointBaseURL;
     private int federationCertificateValidityDays;
+    private int simmetricKeySize;
 
     public Date getNextExpire() throws IllegalStateException, NoSuchObjectLocalException, EJBException {
         return this.expire.getNextTimeout();
@@ -111,6 +112,7 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
     private LocalDispatchingService dispatcher;
 
     public void start() {
+        loadConfig();
         log.info("Inizializing lease and renew timers for the PubSubFederation");
         initializeTimers();
         dispatcher = null;
@@ -254,7 +256,7 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         String path = conf.getString("SecPubSubProxy.keystoreLocation");
         FileInputStream file = null;
         if (path.equals("!SecPubSubProxy.keystoreLocation!")) {
-            log.error("Cannot find the keystore location.");
+            log.error("Cannot find the keystore location in config file.");
         } else {
             try {
                 //Got a valid path
@@ -267,7 +269,7 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
                     KeyStore keyStore = KeyStore.getInstance("JKS");
                     keyStore.load(file, ksPassword.toCharArray());
                     file.close();
-                    if (keyStore.containsAlias("DeliveryManager")) {
+                    if (keyStore.containsAlias("deliveryManager")) {
                         //Loading data of this delivery manager
                         this.privateKey = (PrivateKey) keyStore.getKey("DeliveryManager", ksPassword.toCharArray());
                         this.certChain = keyStore.getCertificateChain("DeliveryManager");
@@ -311,12 +313,24 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
             log.error("Unable to find the CRL dist point in config file");
         }
         String federationCertificateValidityDaysStr = conf.getString("SecPubSubProxy.FederationCertificateValidityDays");
-        if (hashAlgorithm.equals("!SecPubSubProxy.FederationCertificateValidityDays!")) {
+        if (federationCertificateValidityDaysStr.equals("!SecPubSubProxy.FederationCertificateValidityDays!")) {
             log.error("Unable to find the CRL dist point in config file");
         }
         else{
             federationCertificateValidityDays = Integer.parseInt(federationCertificateValidityDaysStr);
         }
+        String simmetricKeySizeStr = conf.getString("SecPubSubProxy.simmetricKeySize");
+        if (simmetricKeySizeStr.equals("!SecPubSubProxy.simmetricKeySize!")) {
+            simmetricKeySize = 256;
+            log.error("Unable to find the CRL dist point in config file");
+        }
+        else{
+            simmetricKeySize = Integer.parseInt(simmetricKeySizeStr);
+        }
 
+    }
+
+    public int getSimmetricKeySize() {
+        return simmetricKeySize;
     }
 }

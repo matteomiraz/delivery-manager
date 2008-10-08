@@ -17,11 +17,13 @@
  */
 package eu.secse.deliveryManager.federations.securepubsub.core;
 
+import Certification.CertificationAuthority;
 import Support.SignatureVerifier;
 import eu.secse.deliveryManager.model.DFederation;
 import eu.secse.deliveryManager.model.DirectMessage;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,6 +84,7 @@ import eu.secse.deliveryManager.reds.InterestEnvelopeWithMetadata;
 import eu.secse.deliveryManager.registry.IRegistryProxy;
 import eu.secse.deliveryManager.timeout.ILeaseManager;
 import eu.secse.deliveryManager.timeout.LeaseExtraInfo;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.NoSuchProviderException;
@@ -90,10 +93,12 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertPath;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import javax.crypto.KeyGenerator;
+import org.apache.axis.encoding.Base64;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.DistributionPoint;
@@ -184,7 +189,25 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     }
 
     public Map<String, String> getFederationCreationOptions(String federationid) {
-        return new HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>();
+        try {
+            //Getting my key from the file
+            MBeanServer server = MBeanServerLocator.locate();
+            ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
+            PrivateKey myPrivateKey = secPubSubMBean.getPrivateKey();
+            PublicKey myPublicKey = secPubSubMBean.getPublicKey();
+            String hashAlgorithm = secPubSubMBean.getHashAlgorithm();
+            //Generating the federation certificate
+            CertificationAuthority ca = new CertificationAuthority("Federation" + federationid, "http://localhost/federationDistPoint",myPublicKey,myPrivateKey,hashAlgorithm);
+            X509Certificate certificate = ca.getCertificate();
+            byte[] derByteEncoded = certificate.getEncoded();
+            map.put("FederationCertificate", Base64.encode(derByteEncoded));
+        } catch (MalformedObjectNameException ex) {
+            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateEncodingException ex) {
+            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return map;
     }
 
     @SuppressWarnings("unchecked")
@@ -204,45 +227,64 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
     }
 
-    public void join(FederationEnt federation, Map<String, String> options) {
-        log.debug("Joining federation " + federation.getId());
+    public void join(FederationEnt federationEnt, Map<String, String> options) {
+        log.debug("Joining federation " + federationEnt.getId());
 
         MBeanServer server = MBeanServerLocator.locate();
         try {
-            ISecPubSubProxyMBean pubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "secPubSubFederationProxy", server);
+            ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
 
             //Subscribing to my direct message.
-            InterestDirectMessage directMessageInterst = new InterestDirectMessage(pubSubMBean.getPublicKey().toString());
-            InterestAuthenticMessage authenticMessage = new InterestAuthenticMessage(pubSubMBean.getTrustedCA());
+            InterestDirectMessage directMessageInterst = new InterestDirectMessage(secPubSubMBean.getPublicKey().toString());
+            InterestAuthenticMessage authenticMessage = new InterestAuthenticMessage(secPubSubMBean.getTrustedCA());
 
             InterestEnvelopeWithMetadata directMessagesFilter = new InterestEnvelopeWithMetadata(directMessageInterst, authenticMessage, registry.getRegistryId());
-            pubSubMBean.subscribe(directMessagesFilter);
+            secPubSubMBean.subscribe(directMessagesFilter);
+
             //Adding filter to FedExtraInfo
-            ((SecPubSubFederationExtraInfo) federation.getExtraInfo()).setFederationFilter(directMessagesFilter);
+            SecPubSubFederationExtraInfo secPubSubFederationExtraInfo = new SecPubSubFederationExtraInfo();
+            secPubSubFederationExtraInfo.setFederationFilter(directMessagesFilter);
 
-            //Sending a JOIN request to the federation leader
-            //Getting data of the federation leader
-            SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) federation.getExtraInfo();
+            //Adding federation certificate
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            String base64certificate = options.get("FederationCertificate");
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(base64certificate));
+            X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
+            secPubSubFederationExtraInfo.setCertificate(certificate);
+
+            //Persisting data
+            secPubSubFederationExtraInfo.setFederation(federationEnt);
+            em.persist(secPubSubFederationExtraInfo);
+
+            federationEnt.setExtraInfo(secPubSubFederationExtraInfo);
+
+            //Sending a JOIN request to the federationEnt leader
+            //Getting data of the federationEnt leader
+            SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) federationEnt.getExtraInfo();
             SecPubSubFederationRequest joinRequest =
-                    new SecPubSubFederationRequest(federation.getId(), SecPubSubFederationRequestReason.JOIN);
+                    new SecPubSubFederationRequest(federationEnt.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage joinMessage =
-                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), joinRequest);
+                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), joinRequest);
             MetaDataSignature joinMessageSignature =
-                    new MetaDataSignature(joinMessage, pubSubMBean.getPrivateKey(),
-                    pubSubMBean.getHashAlgorithm() + "With" + pubSubMBean.getPrivateKey().getAlgorithm(),
-                    pubSubMBean.getCertificationPath());
-            pubSubMBean.publish(joinMessage, joinMessageSignature);
+                    new MetaDataSignature(joinMessage, secPubSubMBean.getPrivateKey(),
+                    secPubSubMBean.getHashAlgorithm() + "With" + secPubSubMBean.getPrivateKey().getAlgorithm(),
+                    secPubSubMBean.getCertificationPath());
+            secPubSubMBean.publish(joinMessage, joinMessageSignature);
 
+        } catch (NoSuchProviderException ex) {
+            log.error("No such provider exception " + ex.getMessage());
+        } catch (CertificateException ex) {
+            log.error("Certificate Exception - Error in reading FederationCertificate " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
-            log.error("Error in encrypting message - Can't find algorithm");
+            log.error("Error in encrypting message - Can't find algorithm " + ex.getMessage());
         } catch (NoSuchPaddingException ex) {
-            log.error("Error in encrypting message - No such padding");
+            log.error("Error in encrypting message - No such padding " + ex.getMessage());
         } catch (InvalidKeyException ex) {
-            log.error("Error in encrypting message - Invalid key");
+            log.error("Error in encrypting message - Invalid key " + ex.getMessage());
         } catch (IllegalBlockSizeException ex) {
-            log.error("Error in encrypting message - Illegal bock size exception");
+            log.error("Error in encrypting message - Illegal bock size exception " + ex.getMessage());
         } catch (BadPaddingException ex) {
-            log.error("Error in encrypting message - Bad padding exception");
+            log.error("Error in encrypting message - Bad padding exception " + ex.getMessage());
         } catch (MalformedObjectNameException e) {
             log.error(e.getMessage());
         }
@@ -260,12 +302,14 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationRequest joinRequest =
                     new SecPubSubFederationRequest(federation.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage leaveMessage =
-                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), joinRequest);
+                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), joinRequest);
             MetaDataSignature leaveMessageSignature =
                     new MetaDataSignature(leaveMessage, pubSubMBean.getPrivateKey(),
                     pubSubMBean.getHashAlgorithm() + "With" + pubSubMBean.getPrivateKey().getAlgorithm(),
                     pubSubMBean.getCertificationPath());
             pubSubMBean.publish(leaveMessage, leaveMessageSignature);
+        } catch (NoSuchProviderException ex) {
+            log.error("Error in encrypting message - No such provider exception " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
             log.error("Error in encrypting message - Can't find algorithm");
         } catch (NoSuchPaddingException ex) {
@@ -296,11 +340,11 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
         facetAddInfo.setInfo(iLease.getLease(fedPromotion.getElement()));
 
-        // lookup federation coordination manager and refresh
+        // lookup federationEnt coordination manager and refresh
         MBeanServer server = MBeanServerLocator.locate();
         try {
             ISecPubSubProxyMBean pubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-            //pubSubMBean.publish(new DFederationMessage(fedPromotion.getFederation().getId(), facetAddInfo));
+            //secPubSubMBean.publish(new DFederationMessage(fedPromotion.getFederation().getId(), facetAddInfo));
             DFederationEncryptedMessage message =
                     new DFederationEncryptedMessage(fedPromotion.getFederation().getId(),
                     facetAddInfo, null,//Insert metadata
@@ -334,7 +378,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
         dService.setInfo(iLease.getLease(fedPromotion.getElement()));
 
-//		lookup federation coordination manager and refresh
+//		lookup federationEnt coordination manager and refresh
         MBeanServer server = MBeanServerLocator.locate();
 
         try {
@@ -456,7 +500,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             return;
         }
 
-        //Getting federation information
+        //Getting federationEnt information
         FederationEnt fed = this.em.find(FederationEnt.class, federationId);
         if (fed == null) {
             log.warn("Received a message form " + federationId + " but I'm not member of such federation");
@@ -480,7 +524,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
     private void restartSubscribe(String federationId) {
         InterestEnvelope federationFilter = new InterestEnvelope(new InterestFederation(federationId), registry.getRegistryId());
-        //lookup federation coordination manager and refresh
+        //lookup federationEnt coordination manager and refresh
         MBeanServer server = MBeanServerLocator.locate();
 
         try {
@@ -575,7 +619,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
             //Getting private key and certificate of the federationLeader
             PrivateKey privateKey = pubSubMBean.getPrivateKey();
-            //Getting federation information
+            //Getting federationEnt information
             FederationEnt fed = this.em.find(FederationEnt.class, user.getFederation());
             if (fed == null) {
                 log.warn("Not in the federation " + user.getFederation());
@@ -640,12 +684,14 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationCertificate fedCertificateMsg =
                     new SecPubSubFederationCertificate(user.getFederation(), certificate);
             try {
-                DirectEncryptedMessage message = new DirectEncryptedMessage(user.getUserKey(), fedCertificateMsg);
+                DirectEncryptedMessage message = new DirectEncryptedMessage(user.getUserKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), fedCertificateMsg);
                 MetaDataSignature signature = new MetaDataSignature(message, privateKey,
                         pubSubMBean.getHashAlgorithm() + "With" + privateKey.getAlgorithm(),
                         pubSubMBean.getCertificationPath());
 
                 pubSubMBean.publish(message, signature);
+            } catch (NoSuchProviderException ex) {
+                log.error("No such provider exception " + ex.getMessage());
             } catch (NoSuchAlgorithmException ex) {
                 log.error("Error in cipher - No such algorithm");
             } catch (NoSuchPaddingException ex) {
@@ -665,9 +711,9 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
     //;-)
     public void allowReadingPermission(SecureFederationUser user) {
-        //Sending the message with the federation key to the user
+        //Sending the message with the federationEnt key to the user
 
-        //Getting federation extra info
+        //Getting federationEnt extra info
         FederationEnt fed = this.em.find(FederationEnt.class, user.getFederation());
         if (fed == null) {
             log.warn("Can't allow the user to the federation because I'm not in the federation");
@@ -688,12 +734,14 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             //Preparing and signing the message
             SecPubSubFederationKey fedKey = new SecPubSubFederationKey(user.getFederation(), fedExtraInfo.getLastKey(), fedExtraInfo.getLastKeyVersion());
             DirectEncryptedMessage federationKeyMessage =
-                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), fedKey);
+                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), fedKey);
             MetaDataSignature signature =
                     new MetaDataSignature(federationKeyMessage, privateKey, hashAlgorithm + "With" + privateKey.getAlgorithm(), certificationPath);
 
             //Publishing message
             pubSubMBean.publish(federationKeyMessage, signature);
+        } catch (NoSuchProviderException ex) {
+            log.error("No such provider exception " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
             log.error("Error in cipher - Missing algorithm");
             return;
@@ -717,7 +765,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
     //;-)
     public void received(String federationId, DFederation federationMessage, Collection<MetaData> metadata) {
-        //Retrivig federation information
+        //Retrivig federationEnt information
         FederationEnt fed = this.em.find(FederationEnt.class, federationId);
         if (fed == null) {
             log.warn("Received a message form " + federationId + " but I'm not member of such federation");
@@ -726,7 +774,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
         X509Certificate federationCertificate = fedExtraInfo.getCertificate();
 
-        //Checking the signature with the federation leader certificate
+        //Checking the signature with the federationEnt leader certificate
         if (SignatureVerifier.verifySignature(federationCertificate, federationMessage, metadata)) {
             log.info("Received a valid secure federation message");
 
@@ -735,7 +783,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 received(federationId, (DFederationReKey) federationMessage);
                 return;
             }
-            //The message isn't a rekey so it is a federation data message
+            //The message isn't a rekey so it is a federationEnt data message
             DFederationPlainMessage dfed = null;
             //Getting the DFederationPlainMessage
             if (federationMessage instanceof DFederationPlainMessage) {
@@ -754,7 +802,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 }
             }
 
-            //Passing the plain federation message to the right receiver
+            //Passing the plain federationEnt message to the right receiver
             if (dfed != null) {
                 if (dfed.getObject() instanceof DService) {
                     received(dfed.getFederationId(), (DService) dfed.getObject(), dfed.getMetadata());
@@ -817,13 +865,13 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     }
                 }
 
-                //Checking if I'm part of the federation
+                //Checking if I'm part of the federationEnt
                 FederationEnt fed = em.find(FederationEnt.class, request.getFederationID());
                 if (fed == null) {
                     log.warn("Not in the federation " + request.getFederationID());
                     return;
                 }
-                
+
                 switch (request.getReason()) {
                     case JOIN:
                         receivedReadRequest(request.getFederationID(),
@@ -850,72 +898,76 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             }
         }
     }
-    
-    	public void receivedReadRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isBanned()) return;
-			if(user.isCanRead()) {
-				allowReadingPermission(user);
-				return;
-			}
-		} else {
-			user = new SecureFederationUser(name, federationId, userKey, certificate);
-			em.persist(user);
-		}
-		
-		user.setWantsRead(true);
-	}
-        
-        /** The user doesn't wants to receive the federation's messages anymore... notice that is the user that wants to quit (he is not banned!) */
-	public void discardReadPermissions(String federationId, PublicKey userKey) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isCanWrite()) {
-				user.setCanWrite(false);
-				removeWritingPermission(user);
-			}
 
-			if(user.isCanRead()) {
-				user.setCanRead(false);
-				removeReadingPermission(user);
-			}
-		}
-	}
-        
-        	public void receivedWriteRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isBanned()) return;
-			if(user.isCanWrite()) {
-				allowWritingPermission(user);
-				return;
-			}
-		} else {
-			user = new SecureFederationUser(name, federationId, userKey, certificate);
-			user.setWantsRead(true);
-			em.persist(user);
-		}
-		
-		user.setWantsWrite(true);
-	}
-                
-                
-	/** The user doesn't wants to send messages to this federation... */
-	public void discardWritePermissions(String federationId, PublicKey userKey) {
-		SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
-		if(user != null) {
-			if(user.isCanWrite()) {
-				user.setCanWrite(false);
-				removeWritingPermission(user);
-			}
-		}
-	}
-        
-        public void discardFederation(String federationId) {
-		Collection<SecureFederationUser> users = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, null);			
-		
-		for (SecureFederationUser u : users)
-			em.remove(u);
-	}
+    public void receivedReadRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
+        SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+        if (user != null) {
+            if (user.isBanned()) {
+                return;
+            }
+            if (user.isCanRead()) {
+                allowReadingPermission(user);
+                return;
+            }
+        } else {
+            user = new SecureFederationUser(name, federationId, userKey, certificate);
+            em.persist(user);
+        }
+
+        user.setWantsRead(true);
+    }
+
+    /** The user doesn't wants to receive the federationEnt's messages anymore... notice that is the user that wants to quit (he is not banned!) */
+    public void discardReadPermissions(String federationId, PublicKey userKey) {
+        SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+        if (user != null) {
+            if (user.isCanWrite()) {
+                user.setCanWrite(false);
+                removeWritingPermission(user);
+            }
+
+            if (user.isCanRead()) {
+                user.setCanRead(false);
+                removeReadingPermission(user);
+            }
+        }
+    }
+
+    public void receivedWriteRequest(String federationId, PublicKey userKey, String name, X509Certificate certificate) {
+        SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+        if (user != null) {
+            if (user.isBanned()) {
+                return;
+            }
+            if (user.isCanWrite()) {
+                allowWritingPermission(user);
+                return;
+            }
+        } else {
+            user = new SecureFederationUser(name, federationId, userKey, certificate);
+            user.setWantsRead(true);
+            em.persist(user);
+        }
+
+        user.setWantsWrite(true);
+    }
+
+    /** The user doesn't wants to send messages to this federationEnt... */
+    public void discardWritePermissions(String federationId, PublicKey userKey) {
+        SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
+        if (user != null) {
+            if (user.isCanWrite()) {
+                user.setCanWrite(false);
+                removeWritingPermission(user);
+            }
+        }
+    }
+
+    public void discardFederation(String federationId) {
+        Collection<SecureFederationUser> users = SecureFederationUser.getAll(em, federationId, null, null, null, null, null, null);
+
+        for (SecureFederationUser u : users) {
+            em.remove(u);
+        }
+    }
 }
