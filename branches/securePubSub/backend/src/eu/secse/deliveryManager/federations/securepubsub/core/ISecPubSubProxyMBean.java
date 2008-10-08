@@ -52,6 +52,8 @@ public interface ISecPubSubProxyMBean {
 
     public String getSimmetricAlgorithm();
 
+    public int getSimmetricKeySize();
+
     public Collection<X509Certificate> getTrustedCA();
 //	Life cycle methods
 	public void start();

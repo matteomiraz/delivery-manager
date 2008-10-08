@@ -1,17 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package eu.secse.deliveryManager.interest;
 
 import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.model.DirectMessage;
 
-/**
- *
- * @author Mario
- */
 public class InterestDirectMessage implements Interest {
     private String receiverID;
     
@@ -28,7 +19,7 @@ public class InterestDirectMessage implements Interest {
 
     public boolean matches(Deliverable msg) {
         if (msg instanceof DirectMessage){
-            return ((DirectMessage) msg).getReceiverID().equals(receiverID);
+            return ((DirectMessage) msg).getReceiverID().equals(receiverID.toString());
         }
         return false;
     }

@@ -570,17 +570,17 @@ public class FederationManager implements
 		secseLogger.event("Creating federation "+name+" of type "+type);
 		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "FM_CREATE", id);
 		
-		Federation f=new Federation();
-		f.setMethod(type);
-		f.setName(name);
+		Federation federation=new Federation();
+		federation.setMethod(type);
+		federation.setName(name);
 		//TODO use a more robust federation id generation algorithm
 		Calendar c=Calendar.getInstance();
 		c.add(Calendar.WEEK_OF_MONTH,1);		
-		f.setLease(c.getTime());
+		federation.setLease(c.getTime());
 		c.add(Calendar.DAY_OF_MONTH,-1);
-		f.setRenew(c.getTime());		
-		f.setOwnership(true);
-		f.setId(id);
+		federation.setRenew(c.getTime());		
+		federation.setOwnership(true);
+		federation.setId(id);
 		FederationProxy proxy=coordinator.getProxy(type);
 		Map<String,String> options=proxy.getFederationCreationOptions(id);
 		Collection<FederationProperty> props=new Vector<FederationProperty>();
@@ -588,11 +588,11 @@ public class FederationManager implements
 			FederationProperty prop=new FederationProperty(e.getKey(),e.getValue());
 			props.add(prop);
 		}
-		f.setProperties(props);
-		f.setOwnership(true);
-		em.persist(f);
+		federation.setProperties(props);
+		federation.setOwnership(true);
+		em.persist(federation);
 		em.flush();
-		coordinator.createFederation(f);
+		coordinator.createFederation(federation);
 		joinFederation(id);
 		return id;		
 	}
