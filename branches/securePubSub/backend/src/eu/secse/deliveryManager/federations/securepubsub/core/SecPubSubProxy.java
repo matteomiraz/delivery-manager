@@ -58,6 +58,7 @@ import eu.secse.deliveryManager.data.FederatedService;
 import eu.secse.deliveryManager.data.FederationEnt;
 import eu.secse.deliveryManager.data.ServiceEnt;
 import eu.secse.deliveryManager.exceptions.NotFoundException;
+import eu.secse.deliveryManager.federations.gossip.messaging.Message;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationCertificate;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationKey;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationRequest;
@@ -72,6 +73,7 @@ import eu.secse.deliveryManager.model.DFederationEncryptedMessage;
 import eu.secse.deliveryManager.model.DFederationPlainMessage;
 import eu.secse.deliveryManager.model.DFederationReKey;
 import eu.secse.deliveryManager.model.DService;
+import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.model.DirectEncryptedMessage;
 import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.FacetSpec;
@@ -734,6 +736,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             String hashAlgorithm = secPubSubMBean.getHashAlgorithm();
 
             //If I don't have any federation key
+
             if (fedExtraInfo.getLastKeyVersion() == 0) {
                 //Generating the first federation key
                 String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
@@ -778,7 +781,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
     }
 
-    //;-)
     public void received(String federationId, DFederation federationMessage, Collection<MetaData> metadata) {
         //Retrivig federationEnt information
         FederationEnt fed = this.em.find(FederationEnt.class, federationId);
@@ -790,7 +792,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         X509Certificate federationCertificate = fedExtraInfo.getCertificate();
 
         //Checking the signature with the federationEnt leader certificate
-        if (SignatureVerifier.verifySignature(federationCertificate, federationMessage, metadata)) {
+        boolean signatureCheck = signatureCheck(federationMessage, metadata);
+        if (signatureCheck) {
             log.info("Received a valid secure federation message");
 
             //Checking if the message is a rekey
@@ -832,30 +835,38 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
     }
 
-
-    //;-)
+    private boolean signatureCheck(Deliverable message,Collection<MetaData> metadata){
+        try {
+            MBeanServer server = MBeanServerLocator.locate();
+            ISecPubSubProxyMBean secPubSubProxyMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
+            Collection<X509Certificate> trustedCA = secPubSubProxyMBean.getTrustedCA();
+            if (trustedCA.isEmpty()) {
+                log.error("TrustedCA list is empty. Please check the keystore. This message will be processed without signature check");
+                return true;
+            } else {
+                return SignatureVerifier.verifySignature(trustedCA, message, metadata);
+            }
+        } catch (MalformedObjectNameException ex) {
+            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
     public void received(DirectMessage directMessage, Collection<MetaData> metadata) {
         //Getting the TrustedCA collection
         MBeanServer server = MBeanServerLocator.locate();
-        Collection<X509Certificate> trustedCA = null;
         PrivateKey privateKey = null;
+        ISecPubSubProxyMBean secPubSubMBean = null;
         try {
-            ISecPubSubProxyMBean pubSubMBean =
+            secPubSubMBean =
                     (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-            trustedCA = pubSubMBean.getTrustedCA();
-            privateKey = pubSubMBean.getPrivateKey();
+            privateKey = secPubSubMBean.getPrivateKey();
         } catch (MalformedObjectNameException e) {
             log.error(e.getMessage());
         }
 
         //Checking the signature
-        boolean signatureCheck;
-        if (trustedCA.isEmpty()) {
-            log.error("TrustedCA list is empty. Please check the keystore. This message will be processed without signature check");
-            signatureCheck = true;
-        } else {
-            signatureCheck = SignatureVerifier.verifySignature(trustedCA, directMessage, metadata);
-        }
+        boolean signatureCheck = signatureCheck(directMessage, metadata);
         if (signatureCheck) {
             //Getting the control message from the direct message
             DirectPlainMessage message = null;
