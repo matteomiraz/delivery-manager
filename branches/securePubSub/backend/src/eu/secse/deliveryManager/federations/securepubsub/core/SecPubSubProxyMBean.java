@@ -269,17 +269,18 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
                     KeyStore keyStore = KeyStore.getInstance("JKS");
                     keyStore.load(file, ksPassword.toCharArray());
                     file.close();
-                    if (keyStore.containsAlias("deliveryManager")) {
+                    String deliveryManagerAlias = "delivery-manager";
+                    if (keyStore.containsAlias(deliveryManagerAlias)) {
                         //Loading data of this delivery manager
-                        this.privateKey = (PrivateKey) keyStore.getKey("DeliveryManager", ksPassword.toCharArray());
-                        this.certChain = keyStore.getCertificateChain("DeliveryManager");
+                        this.privateKey = (PrivateKey) keyStore.getKey(deliveryManagerAlias, ksPassword.toCharArray());
+                        this.certChain = keyStore.getCertificateChain(deliveryManagerAlias);
 
                         //Setting the trustedCA
                         this.trustedCA = new Vector<X509Certificate>();
                         for (Enumeration<String> e = keyStore.aliases();
                                 e.hasMoreElements();) {
                             String alias = e.nextElement();
-                            if (!alias.equals("DeliveryManager")) {
+                            if (!alias.equals(deliveryManagerAlias)) {
                                 this.trustedCA.add((X509Certificate) keyStore.getCertificate(alias));
                             }
                         }

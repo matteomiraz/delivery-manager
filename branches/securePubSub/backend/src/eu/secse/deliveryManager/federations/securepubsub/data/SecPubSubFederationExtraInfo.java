@@ -32,6 +32,7 @@ import eu.secse.deliveryManager.data.FederationExtraInfo;
 import eu.secse.deliveryManager.reds.InterestEnvelope;
 import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 
 /**
  * This entity has to be inserted in delivery-directory/META-INF/persistence.xml
@@ -54,7 +55,9 @@ public class SecPubSubFederationExtraInfo extends FederationExtraInfo{
         private X509Certificate federationCertificate;
 	
 	public SecPubSubFederationExtraInfo() {
-		super();		
+		super();	    
+                keys = new HashMap();
+                lastKeyVersion = 0;
 	}
 
 	public SecPubSubFederationExtraInfo(InterestEnvelope federationFilter) {

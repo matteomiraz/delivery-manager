@@ -43,7 +43,7 @@ public class DirectEncryptedMessage implements DirectMessage {
         //Encrypting the simmetric key
         cipher = Cipher.getInstance(publicKey.getAlgorithm(), "BC");
         cipher.init(Cipher.WRAP_MODE, publicKey);
-        cipher.wrap(simmetricKey);
+        encryptedSimmetricKey = cipher.wrap(simmetricKey);
         this.simmetricAlgorithm = simmetricAlgorithm;
     }
 

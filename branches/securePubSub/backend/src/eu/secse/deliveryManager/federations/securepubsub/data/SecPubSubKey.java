@@ -1,6 +1,5 @@
 package eu.secse.deliveryManager.federations.securepubsub.data;
 
-import java.io.Serializable;
 
 import java.security.Key;
 import javax.persistence.Entity;
