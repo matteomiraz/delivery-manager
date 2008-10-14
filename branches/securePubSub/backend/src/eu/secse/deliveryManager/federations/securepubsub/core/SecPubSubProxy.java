@@ -58,7 +58,6 @@ import eu.secse.deliveryManager.data.FederatedService;
 import eu.secse.deliveryManager.data.FederationEnt;
 import eu.secse.deliveryManager.data.ServiceEnt;
 import eu.secse.deliveryManager.exceptions.NotFoundException;
-import eu.secse.deliveryManager.federations.gossip.messaging.Message;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationCertificate;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationKey;
 import eu.secse.deliveryManager.federations.securepubsub.Messages.SecPubSubFederationRequest;
@@ -741,12 +740,12 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 //Generating the first federation key
                 String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
                 int simmetricKeySize = secPubSubMBean.getSimmetricKeySize();
-                
+
                 KeyGenerator keyGenerator = KeyGenerator.getInstance(simmetricAlgorithm);
                 keyGenerator.init(simmetricKeySize);
                 SecretKey simmetricKey = keyGenerator.generateKey();
-                
-                fedExtraInfo.addKey(em, simmetricKey, fedExtraInfo.getLastKeyVersion()+1);
+
+                fedExtraInfo.addKey(em, simmetricKey, fedExtraInfo.getLastKeyVersion() + 1);
                 em.persist(fedExtraInfo);
             }
             //Preparing and signing the message
@@ -835,7 +834,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
     }
 
-    private boolean signatureCheck(Deliverable message,Collection<MetaData> metadata){
+    private boolean signatureCheck(Deliverable message, Collection<MetaData> metadata) {
         try {
             MBeanServer server = MBeanServerLocator.locate();
             ISecPubSubProxyMBean secPubSubProxyMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
@@ -851,16 +850,18 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
         return false;
     }
-    
+
     public void received(DirectMessage directMessage, Collection<MetaData> metadata) {
         //Getting the TrustedCA collection
         MBeanServer server = MBeanServerLocator.locate();
         PrivateKey privateKey = null;
+        PublicKey publicKey =null;
         ISecPubSubProxyMBean secPubSubMBean = null;
         try {
             secPubSubMBean =
                     (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
             privateKey = secPubSubMBean.getPrivateKey();
+            publicKey = secPubSubMBean.getPublicKey();
         } catch (MalformedObjectNameException e) {
             log.error(e.getMessage());
         }
@@ -928,6 +929,32 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                         break;
 
                 }
+            }
+            if (message.getMessage() instanceof DFederationReKey) {
+                //I got a new key for the federation
+                DFederationReKey reKeyMessage = (DFederationReKey) message.getMessage();
+                FederationEnt fed = this.em.find(FederationEnt.class, reKeyMessage.federationId);
+                if (fed == null) {
+                    log.warn("Received a message form " + reKeyMessage.federationId + " but I'm not member of such federation");
+                    return;
+                }
+                //Adding key information to federation extra info
+                SecPubSubFederationExtraInfo extraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
+                extraInfo.addKey(em, reKeyMessage.getFederationKey(publicKey, privateKey), reKeyMessage.getKeyVersion());
+                return;
+            }
+            if (message.getMessage() instanceof SecPubSubFederationKey) {
+                //I got a new key for the federation
+                SecPubSubFederationKey keyMessage = (SecPubSubFederationKey) message.getMessage();
+                FederationEnt fed = this.em.find(FederationEnt.class, keyMessage.getFederationId());
+                if (fed == null) {
+                    log.warn("Received a message form " + keyMessage.getFederationId() + " but I'm not member of such federation");
+                    return;
+                }
+                //Adding key information to federation extra info
+                SecPubSubFederationExtraInfo extraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
+                extraInfo.addKey(em,keyMessage.getKey(),keyMessage.getKeyVersion());
+                return;
             }
         }
     }
