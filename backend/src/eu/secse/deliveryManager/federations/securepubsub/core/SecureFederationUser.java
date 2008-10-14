@@ -53,7 +53,6 @@ public class SecureFederationUser {
         this.federation = federation;
         this.userKey = userKey;
         this.certificate = certificate;
-        this.certificate = null;
     }
 
     public long getId() {

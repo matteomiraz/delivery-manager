@@ -1,6 +1,5 @@
 package eu.secse.deliveryManager.federations.securepubsub.core;
 
-import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;

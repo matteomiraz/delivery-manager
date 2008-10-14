@@ -98,6 +98,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import org.apache.axis.encoding.Base64;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
@@ -197,15 +198,17 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             PrivateKey myPrivateKey = secPubSubMBean.getPrivateKey();
             PublicKey myPublicKey = secPubSubMBean.getPublicKey();
             String hashAlgorithm = secPubSubMBean.getHashAlgorithm();
+
             //Generating the federation certificate
-            CertificationAuthority ca = new CertificationAuthority("Federation" + federationid, "http://localhost/federationDistPoint",myPublicKey,myPrivateKey,hashAlgorithm);
+            CertificationAuthority ca = new CertificationAuthority("Federation" + federationid, "http://localhost/federationDistPoint", myPublicKey, myPrivateKey, hashAlgorithm);
             X509Certificate certificate = ca.getCertificate();
             byte[] derByteEncoded = certificate.getEncoded();
             map.put("FederationCertificate", Base64.encode(derByteEncoded));
+
         } catch (MalformedObjectNameException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("URL of the CRL dist point isn't valid. " + ex);
         } catch (CertificateEncodingException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("Wrong certificate encoding. " + ex);
         }
         return map;
     }
@@ -709,7 +712,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
     }
 
-    //;-)
     public void allowReadingPermission(SecureFederationUser user) {
         //Sending the message with the federationEnt key to the user
 
@@ -723,23 +725,36 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
         MBeanServer server = MBeanServerLocator.locate();
         try {
-            ISecPubSubProxyMBean pubSubMBean =
+            ISecPubSubProxyMBean secPubSubMBean =
                     (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
 
             //Getting my keys and certification path
-            PrivateKey privateKey = pubSubMBean.getPrivateKey();
-            CertPath certificationPath = pubSubMBean.getCertificationPath();
-            String hashAlgorithm = pubSubMBean.getHashAlgorithm();
+            PrivateKey privateKey = secPubSubMBean.getPrivateKey();
+            CertPath certificationPath = secPubSubMBean.getCertificationPath();
+            String hashAlgorithm = secPubSubMBean.getHashAlgorithm();
 
+            //If I don't have any federation key
+            if (fedExtraInfo.getLastKeyVersion() == 0) {
+                //Generating the first federation key
+                String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
+                int simmetricKeySize = secPubSubMBean.getSimmetricKeySize();
+                
+                KeyGenerator keyGenerator = KeyGenerator.getInstance(simmetricAlgorithm);
+                keyGenerator.init(simmetricKeySize);
+                SecretKey simmetricKey = keyGenerator.generateKey();
+                
+                fedExtraInfo.addKey(em, simmetricKey, fedExtraInfo.getLastKeyVersion()+1);
+                em.persist(fedExtraInfo);
+            }
             //Preparing and signing the message
             SecPubSubFederationKey fedKey = new SecPubSubFederationKey(user.getFederation(), fedExtraInfo.getLastKey(), fedExtraInfo.getLastKeyVersion());
             DirectEncryptedMessage federationKeyMessage =
-                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), fedKey);
+                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), fedKey);
             MetaDataSignature signature =
                     new MetaDataSignature(federationKeyMessage, privateKey, hashAlgorithm + "With" + privateKey.getAlgorithm(), certificationPath);
 
             //Publishing message
-            pubSubMBean.publish(federationKeyMessage, signature);
+            secPubSubMBean.publish(federationKeyMessage, signature);
         } catch (NoSuchProviderException ex) {
             log.error("No such provider exception " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
@@ -834,7 +849,14 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
 
         //Checking the signature
-        if (SignatureVerifier.verifySignature(trustedCA, directMessage, metadata)) {
+        boolean signatureCheck;
+        if (trustedCA.isEmpty()) {
+            log.error("TrustedCA list is empty. Please check the keystore. This message will be processed without signature check");
+            signatureCheck = true;
+        } else {
+            signatureCheck = SignatureVerifier.verifySignature(trustedCA, directMessage, metadata);
+        }
+        if (signatureCheck) {
             //Getting the control message from the direct message
             DirectPlainMessage message = null;
             if (directMessage instanceof DirectPlainMessage) {
