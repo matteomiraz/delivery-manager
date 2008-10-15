@@ -237,24 +237,24 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         MBeanServer server = MBeanServerLocator.locate();
         try {
             ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-
-            //Subscribing to my direct message.
-            InterestDirectMessage directMessageInterst = new InterestDirectMessage(secPubSubMBean.getPublicKey().toString());
-            InterestAuthenticMessage authenticMessage = new InterestAuthenticMessage(secPubSubMBean.getTrustedCA());
-
-            InterestEnvelopeWithMetadata directMessagesFilter = new InterestEnvelopeWithMetadata(directMessageInterst, authenticMessage, registry.getRegistryId());
-            secPubSubMBean.subscribe(directMessagesFilter);
-
-            //Adding filter to FedExtraInfo
+            
             SecPubSubFederationExtraInfo secPubSubFederationExtraInfo = new SecPubSubFederationExtraInfo();
-            secPubSubFederationExtraInfo.setFederationFilter(directMessagesFilter);
-
             //Adding federation certificate
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             String base64certificate = options.get("FederationCertificate");
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(base64certificate));
             X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
             secPubSubFederationExtraInfo.setCertificate(certificate);
+            
+            //Subscribing to federation filter
+            InterestFederation interestFederation = new InterestFederation(federationEnt.getId());
+            InterestAuthenticMessage interestAuthenticMessage;
+            interestAuthenticMessage = new InterestAuthenticMessage(certificate);
+            InterestEnvelopeWithMetadata federationFilter;
+            federationFilter = new InterestEnvelopeWithMetadata(interestFederation, interestAuthenticMessage,registry.getRegistryId());
+            
+            //Adding filter to FedExtraInfo
+            secPubSubFederationExtraInfo.setFederationFilter(federationFilter);
 
             //Persisting data
             secPubSubFederationExtraInfo.setFederation(federationEnt);
@@ -386,8 +386,22 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         MBeanServer server = MBeanServerLocator.locate();
 
         try {
-            ISecPubSubProxyMBean pubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-            pubSubMBean.publish(new DFederationPlainMessage(fedPromotion.getFederation().getId(), dService));
+            ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
+            //Getting federation ent
+            FederationEnt federationEnt = fedPromotion.getFederation();
+            //Getting last federation key
+            Key federationKey = ((SecPubSubFederationExtraInfo) federationEnt.getExtraInfo()).getLastKey();
+            long federationKeyVersion = ((SecPubSubFederationExtraInfo) federationEnt.getExtraInfo()).getLastKeyVersion();
+            //Getting private key and other settings
+            PrivateKey privateKey = secPubSubMBean.getPrivateKey();
+            String signatureAlgorithm = secPubSubMBean.getHashAlgorithm() + "With" + privateKey.getAlgorithm();
+            CertPath certificationPath = secPubSubMBean.getCertificationPath();
+            //Generating the message
+            DFederationPlainMessage plainMessage = new DFederationPlainMessage(fedPromotion.getFederation().getId(), dService);
+            DFederationEncryptedMessage encryptedMessage = plainMessage.encrypt(federationKey, federationKeyVersion);
+            //Generating metadata
+            MetaDataSignature signature = new MetaDataSignature(encryptedMessage, privateKey, signatureAlgorithm, certificationPath);
+            secPubSubMBean.publish(encryptedMessage, signature);
             if (fedPromotion.isShareAll()) {
 //				add additional facets
                 log.info("Sending Additional Facet for service " + dService.getServiceID());
@@ -404,17 +418,17 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 }
             }
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("The chosen algorithm cannot be found. " + ex);
         } catch (NoSuchPaddingException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         } catch (InvalidKeyException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("Invalid key. " + ex);
         } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         } catch (BadPaddingException ex) {
-            Logger.getLogger(SecPubSubProxy.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         } catch (MalformedObjectNameException e) {
-            log.error(e.getMessage());
+            log.error(e);
         }
     }
 
@@ -614,7 +628,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     public void removeWritingPermission(SecureFederationUser user) {
     }
 
-    //:-)
     public void allowWritingPermission(SecureFederationUser user) {
         MBeanServer server = MBeanServerLocator.locate();
         try {
@@ -855,7 +868,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         //Getting the TrustedCA collection
         MBeanServer server = MBeanServerLocator.locate();
         PrivateKey privateKey = null;
-        PublicKey publicKey =null;
+        PublicKey publicKey = null;
         ISecPubSubProxyMBean secPubSubMBean = null;
         try {
             secPubSubMBean =
@@ -953,7 +966,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 }
                 //Adding key information to federation extra info
                 SecPubSubFederationExtraInfo extraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
-                extraInfo.addKey(em,keyMessage.getKey(),keyMessage.getKeyVersion());
+                extraInfo.addKey(em, keyMessage.getKey(), keyMessage.getKeyVersion());
                 return;
             }
         }
