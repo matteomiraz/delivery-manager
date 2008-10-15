@@ -52,10 +52,10 @@ public class DFederationPlainMessage extends DFederation {
         this.metadata.add(metadata);
     }
     
-    public DFederationEncryptedMessage encrypt(Key federationKey){
+    public DFederationEncryptedMessage encrypt(Key federationKey,long keyVersion){
         DFederationEncryptedMessage message = null;
         try {
-            message = new DFederationEncryptedMessage(federationId, object, metadata, federationKey, serialVersionUID);
+            message = new DFederationEncryptedMessage(federationId, object, metadata, federationKey, keyVersion);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(DFederationPlainMessage.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchPaddingException ex) {

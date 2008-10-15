@@ -43,10 +43,13 @@ import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubFederatio
 import eu.secse.deliveryManager.federations.securepubsub.reds.RedsSecPubSubFederationListener;
 import eu.secse.deliveryManager.federations.securepubsub.timer.IFedSecPsExpire;
 import eu.secse.deliveryManager.federations.securepubsub.timer.IFedSecPsRenew;
+import eu.secse.deliveryManager.interest.InterestAuthenticMessage;
+import eu.secse.deliveryManager.interest.InterestDirectMessage;
 import eu.secse.deliveryManager.model.Deliverable;
 import eu.secse.deliveryManager.model.MetaData;
 import eu.secse.deliveryManager.reds.Envelope;
 import eu.secse.deliveryManager.reds.EnvelopeWithMetadata;
+import eu.secse.deliveryManager.reds.InterestEnvelopeWithMetadata;
 import eu.secse.deliveryManager.registry.IRegistryProxy;
 import eu.secse.deliveryManager.utils.IConfiguration;
 import eu.secse.reds.core.IRedsConnector;
@@ -113,6 +116,7 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
 
     public void start() {
         loadConfig();
+        subscribeMyDirectMessage();
         log.info("Inizializing lease and renew timers for the PubSubFederation");
         initializeTimers();
         dispatcher = null;
@@ -136,6 +140,13 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         log.info("subscribing all federations");
         subscribeAll();
 
+    }
+
+    private void subscribeMyDirectMessage() {
+        InterestDirectMessage directMessageInterst = new InterestDirectMessage(getPublicKey().toString());
+        InterestAuthenticMessage authenticMessage = new InterestAuthenticMessage(getTrustedCA());
+        InterestEnvelopeWithMetadata directMessagesFilter = new InterestEnvelopeWithMetadata(directMessageInterst, authenticMessage, registry.getRegistryId());
+        subscribe(directMessagesFilter);
     }
 
     public void subscribe(ComparableFilter filter) {
@@ -316,16 +327,14 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         String federationCertificateValidityDaysStr = conf.getString("SecPubSubProxy.FederationCertificateValidityDays");
         if (federationCertificateValidityDaysStr.equals("!SecPubSubProxy.FederationCertificateValidityDays!")) {
             log.error("Unable to find the CRL dist point in config file");
-        }
-        else{
+        } else {
             federationCertificateValidityDays = Integer.parseInt(federationCertificateValidityDaysStr);
         }
         String simmetricKeySizeStr = conf.getString("SecPubSubProxy.simmetricKeySize");
         if (simmetricKeySizeStr.equals("!SecPubSubProxy.simmetricKeySize!")) {
             simmetricKeySize = 256;
             log.error("Unable to find the CRL dist point in config file");
-        }
-        else{
+        } else {
             simmetricKeySize = Integer.parseInt(simmetricKeySizeStr);
         }
 
