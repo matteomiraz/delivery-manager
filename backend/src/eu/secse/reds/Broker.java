@@ -47,7 +47,7 @@ import eu.secse.reds.messages.WakeUpMessage;
 public class Broker {
 
 	private static final int REDS_TCP_PORT = 5555;
-	private static final long STEP = 20 * 30 * 1000;
+	private static final long STEP = 15 * 1000;
 
 	/**
 	 * Usage: java eu.secse.reds.Broker otherBroker listeningPort<br>
