@@ -116,7 +116,6 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
 
     public void start() {
         loadConfig();
-        subscribeMyDirectMessage();
         log.info("Inizializing lease and renew timers for the PubSubFederation");
         initializeTimers();
         dispatcher = null;
@@ -137,6 +136,8 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
             return;
         }
 
+        subscribeMyDirectMessage();
+        
         log.info("subscribing all federations");
         subscribeAll();
 

@@ -66,7 +66,6 @@ import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubFedElemEx
 import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubFederationExtraInfo;
 import eu.secse.deliveryManager.federations.securepubsub.data.SecPubSubPromotionExtraInfo;
 import eu.secse.deliveryManager.interest.InterestAuthenticMessage;
-import eu.secse.deliveryManager.interest.InterestDirectMessage;
 import eu.secse.deliveryManager.interest.InterestFederation;
 import eu.secse.deliveryManager.model.DFederationEncryptedMessage;
 import eu.secse.deliveryManager.model.DFederationPlainMessage;
@@ -141,7 +140,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     public void addFacetSpec(FederatedPromotion prom, FacetSpec facetSpecification) {
 
         DService service = modelManager.getServiceData(((ServiceEnt) prom.getElement()).getElemPK().getId());
-//		
+
         this.addService(prom, service);
 
     }
@@ -237,7 +236,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         MBeanServer server = MBeanServerLocator.locate();
         try {
             ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-            
+
             SecPubSubFederationExtraInfo secPubSubFederationExtraInfo = new SecPubSubFederationExtraInfo();
             //Adding federation certificate
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
@@ -245,14 +244,16 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(Base64.decode(base64certificate));
             X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(byteArrayInputStream);
             secPubSubFederationExtraInfo.setCertificate(certificate);
-            
+
             //Subscribing to federation filter
             InterestFederation interestFederation = new InterestFederation(federationEnt.getId());
             InterestAuthenticMessage interestAuthenticMessage;
             interestAuthenticMessage = new InterestAuthenticMessage(certificate);
             InterestEnvelopeWithMetadata federationFilter;
-            federationFilter = new InterestEnvelopeWithMetadata(interestFederation, interestAuthenticMessage,registry.getRegistryId());
-            
+            federationFilter = new InterestEnvelopeWithMetadata(interestFederation, interestAuthenticMessage, registry.getRegistryId());
+
+            secPubSubMBean.subscribe(federationFilter);
+
             //Adding filter to FedExtraInfo
             secPubSubFederationExtraInfo.setFederationFilter(federationFilter);
 
@@ -432,6 +433,10 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         }
     }
 
+    private void received(String federationId, DService dService, Collection<MetaData> metadata) {
+        received(federationId, dService);
+    }
+
     /*
      * Process the message that contains the promotion of a service without its additional facets
      * PRECONDITIOND:
@@ -530,10 +535,6 @@ public class SecPubSubProxy implements ISecPubSubProxy {
         fedExtraInfo.addKey(em,
                 reKeyMessage.getFederationKey(publicKey, privateKey),
                 reKeyMessage.getKeyVersion());
-    }
-
-    private void received(String federationId, DService dService, Collection<MetaData> metadata) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private void received(String federationId, FacetAddInfo facetAddInfo, Collection<MetaData> metadata) {
