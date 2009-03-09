@@ -204,6 +204,7 @@ public class ModelManagerBean implements ModelManager {
 	/**
 	 * Segnala la ricezione di un servizio (vengono ignorate le facet attaccate!) che vanno inseriti nel registro locale
 	 */
+        @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public ServiceEnt add(DService service) {
 
 		if (service==null) {
@@ -226,7 +227,9 @@ public class ModelManagerBean implements ModelManager {
 
 			return srv;
 		} catch (RemoteException e) {
-			log.debug("Exception raised while talking with the registry...");
+			log.debug("Exception raised while talking with the registry... ");
+                        log.debug(e.getMessage());
+                        e.printStackTrace();
 			return null;
 		}
 	}

@@ -50,6 +50,8 @@ public interface ISecPubSubProxyMBean {
 
     public PublicKey getPublicKey();
 
+    public String getSignatureAlgorithm();
+
     public String getSimmetricAlgorithm();
 
     public int getSimmetricKeySize();

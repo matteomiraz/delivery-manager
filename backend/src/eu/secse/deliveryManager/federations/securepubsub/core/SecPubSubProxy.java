@@ -91,7 +91,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.cert.CertPath;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
@@ -270,12 +269,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     new SecPubSubFederationRequest(federationEnt.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage joinMessage =
                     new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), joinRequest);
-            MetaDataSignature joinMessageSignature =
-                    new MetaDataSignature(joinMessage, secPubSubMBean.getPrivateKey(),
-                    secPubSubMBean.getHashAlgorithm() + "With" + secPubSubMBean.getPrivateKey().getAlgorithm(),
-                    secPubSubMBean.getCertificationPath());
-            secPubSubMBean.publish(joinMessage, joinMessageSignature);
-
+            
+            signAndSend(joinMessage);
         } catch (NoSuchProviderException ex) {
             log.error("No such provider exception " + ex.getMessage());
         } catch (CertificateException ex) {
@@ -308,11 +303,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     new SecPubSubFederationRequest(federation.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage leaveMessage =
                     new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), joinRequest);
-            MetaDataSignature leaveMessageSignature =
-                    new MetaDataSignature(leaveMessage, pubSubMBean.getPrivateKey(),
-                    pubSubMBean.getHashAlgorithm() + "With" + pubSubMBean.getPrivateKey().getAlgorithm(),
-                    pubSubMBean.getCertificationPath());
-            pubSubMBean.publish(leaveMessage, leaveMessageSignature);
+            
+            signAndSend(leaveMessage);
         } catch (NoSuchProviderException ex) {
             log.error("Error in encrypting message - No such provider exception " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
@@ -383,7 +375,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
         dService.setInfo(iLease.getLease(fedPromotion.getElement()));
 
-//		lookup federationEnt coordination manager and refresh
+        // lookup federationEnt coordination manager and refresh
         MBeanServer server = MBeanServerLocator.locate();
 
         try {
@@ -393,16 +385,12 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             //Getting last federation key
             Key federationKey = ((SecPubSubFederationExtraInfo) federationEnt.getExtraInfo()).getLastKey();
             long federationKeyVersion = ((SecPubSubFederationExtraInfo) federationEnt.getExtraInfo()).getLastKeyVersion();
-            //Getting private key and other settings
-            PrivateKey privateKey = secPubSubMBean.getPrivateKey();
-            String signatureAlgorithm = secPubSubMBean.getHashAlgorithm() + "With" + privateKey.getAlgorithm();
-            CertPath certificationPath = secPubSubMBean.getCertificationPath();
+            
             //Generating the message
             DFederationPlainMessage plainMessage = new DFederationPlainMessage(fedPromotion.getFederation().getId(), dService);
             DFederationEncryptedMessage encryptedMessage = plainMessage.encrypt(federationKey, federationKeyVersion);
-            //Generating metadata
-            MetaDataSignature signature = new MetaDataSignature(encryptedMessage, privateKey, signatureAlgorithm, certificationPath);
-            secPubSubMBean.publish(encryptedMessage, signature);
+            
+            signAndSend(encryptedMessage);
             if (fedPromotion.isShareAll()) {
 //				add additional facets
                 log.info("Sending Additional Facet for service " + dService.getServiceID());
@@ -584,46 +572,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
     }
 
     public void removeReadingPermission(SecureFederationUser user) {
-        //We have to do a rekey
-        MBeanServer server = MBeanServerLocator.locate();
-        try {
-            ISecPubSubProxyMBean pubSubMBean =
-                    (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
-
-            //Generating the key
-            KeyGenerator kg = KeyGenerator.getInstance(pubSubMBean.getSimmetricAlgorithm());
-            Key newKey = kg.generateKey();
-
-            //Adding key to FedExtraInfo
-            FederationEnt fed = this.em.find(FederationEnt.class, user.getFederation());
-            if (fed == null) {
-                log.error("Can't send a reKey to " + user.getFederation() + " because I'm not member of such federation");
-                return;
-            }
-            SecPubSubFederationExtraInfo fedExtraInfo =
-                    (SecPubSubFederationExtraInfo) fed.getExtraInfo();
-            long newKeyVersion = fedExtraInfo.getLastKeyVersion() + 1;
-            fedExtraInfo.addKey(em, newKey, newKeyVersion);
-
-            //Sending the reKey message
-            DFederationReKey reKeyMessage = null;
-            /*
-            new DFederationReKey(user.getFederation(), newKey, newKeyVersion,
-            SecureFederationUser.getAll(em, user.getFederation(), true, true, true, null, null, false)
-             */
-            MetaDataSignature signature =
-                    new MetaDataSignature(reKeyMessage, pubSubMBean.getPrivateKey(),
-                    pubSubMBean.getHashAlgorithm() + "With" + pubSubMBean.getPrivateKey().getAlgorithm(),
-                    pubSubMBean.getCertificationPath());
-
-            pubSubMBean.publish(reKeyMessage, signature);
-        } catch (InvalidKeyException ex) {
-            log.error("Signing the message - Invalid private key");
-        } catch (NoSuchAlgorithmException ex) {
-            log.error("Generating a new federation key - No such algorithm");
-        } catch (MalformedObjectNameException e) {
-            log.error(e.getMessage());
-        }
+        generateNewFederationKey(user.getFederation());
+        sendReKeyMessage(user.getFederation());
     }
 
     public void removeWritingPermission(SecureFederationUser user) {
@@ -703,11 +653,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                     new SecPubSubFederationCertificate(user.getFederation(), certificate);
             try {
                 DirectEncryptedMessage message = new DirectEncryptedMessage(user.getUserKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), fedCertificateMsg);
-                MetaDataSignature signature = new MetaDataSignature(message, privateKey,
-                        pubSubMBean.getHashAlgorithm() + "With" + privateKey.getAlgorithm(),
-                        pubSubMBean.getCertificationPath());
-
-                pubSubMBean.publish(message, signature);
+                
+                signAndSend(message);
             } catch (NoSuchProviderException ex) {
                 log.error("No such provider exception " + ex.getMessage());
             } catch (NoSuchAlgorithmException ex) {
@@ -743,34 +690,17 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             ISecPubSubProxyMBean secPubSubMBean =
                     (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
 
-            //Getting my keys and certification path
-            PrivateKey privateKey = secPubSubMBean.getPrivateKey();
-            CertPath certificationPath = secPubSubMBean.getCertificationPath();
-            String hashAlgorithm = secPubSubMBean.getHashAlgorithm();
-
             //If I don't have any federation key
-
             if (fedExtraInfo.getLastKeyVersion() == 0) {
-                //Generating the first federation key
-                String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
-                int simmetricKeySize = secPubSubMBean.getSimmetricKeySize();
-
-                KeyGenerator keyGenerator = KeyGenerator.getInstance(simmetricAlgorithm);
-                keyGenerator.init(simmetricKeySize);
-                SecretKey simmetricKey = keyGenerator.generateKey();
-
-                fedExtraInfo.addKey(em, simmetricKey, fedExtraInfo.getLastKeyVersion() + 1);
-                em.persist(fedExtraInfo);
+                generateNewFederationKey(user.getFederation());
             }
+            
             //Preparing and signing the message
             SecPubSubFederationKey fedKey = new SecPubSubFederationKey(user.getFederation(), fedExtraInfo.getLastKey(), fedExtraInfo.getLastKeyVersion());
             DirectEncryptedMessage federationKeyMessage =
                     new DirectEncryptedMessage(user.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), fedKey);
-            MetaDataSignature signature =
-                    new MetaDataSignature(federationKeyMessage, privateKey, hashAlgorithm + "With" + privateKey.getAlgorithm(), certificationPath);
-
-            //Publishing message
-            secPubSubMBean.publish(federationKeyMessage, signature);
+            
+            signAndSend(federationKeyMessage);
         } catch (NoSuchProviderException ex) {
             log.error("No such provider exception " + ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
@@ -993,6 +923,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
 
     /** The user doesn't wants to receive the federationEnt's messages anymore... notice that is the user that wants to quit (he is not banned!) */
     public void discardReadPermissions(String federationId, PublicKey userKey) {
+        //Updating user database
         SecureFederationUser user = SecureFederationUser.findUser(em, federationId, userKey);
         if (user != null) {
             if (user.isCanWrite()) {
@@ -1004,6 +935,66 @@ public class SecPubSubProxy implements ISecPubSubProxy {
                 user.setCanRead(false);
                 removeReadingPermission(user);
             }
+        }
+
+        //Generating a new key and sending a rekey
+        generateNewFederationKey(federationId);
+        sendReKeyMessage(federationId);
+    }
+
+    private void signAndSend(Deliverable message) {
+        try {
+            MBeanServer server = MBeanServerLocator.locate();
+            ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
+
+            MetaDataSignature signature =
+                    new MetaDataSignature(message, secPubSubMBean.getPrivateKey(),
+                    secPubSubMBean.getSignatureAlgorithm(), secPubSubMBean.getCertificationPath());
+
+            secPubSubMBean.publish(message, signature);
+        } catch (NoSuchAlgorithmException ex) {
+            log.error(ex.getMessage());
+        } catch (InvalidKeyException ex) {
+            log.error(ex.getMessage());
+        } catch (MalformedObjectNameException ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
+    private void sendReKeyMessage(String federationId) {
+        //Getting federation information
+        FederationEnt fed = em.find(FederationEnt.class, federationId);
+        SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
+
+        Collection<SecureFederationUser> receivers;
+        receivers = SecureFederationUser.getAll(em, federationId, null, true, null, null, null, false);
+
+        DFederationReKey reKeyMessage;
+        reKeyMessage = new DFederationReKey(federationId, fedExtraInfo.getLastKey(), fedExtraInfo.getLastKeyVersion(), receivers);
+        signAndSend(reKeyMessage);
+    }
+
+    private void generateNewFederationKey(String federationId) {
+        try {
+            MBeanServer server = MBeanServerLocator.locate();
+            ISecPubSubProxyMBean secPubSubMBean = (ISecPubSubProxyMBean) MBeanProxyExt.create(ISecPubSubProxyMBean.class, "DeliveryManager:service=secPubSubFederationProxy", server);
+            FederationEnt fed = em.find(FederationEnt.class, federationId);
+            SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
+
+            //Generating the first federation key
+            String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
+            int simmetricKeySize = secPubSubMBean.getSimmetricKeySize();
+
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(simmetricAlgorithm);
+            keyGenerator.init(simmetricKeySize);
+            SecretKey simmetricKey = keyGenerator.generateKey();
+
+            fedExtraInfo.addKey(em, simmetricKey, fedExtraInfo.getLastKeyVersion() + 1);
+            em.persist(fedExtraInfo);
+        } catch (NoSuchAlgorithmException ex) {
+            log.error("Error in cipher. Missing algorithm: " + ex.getMessage());
+        } catch (MalformedObjectNameException ex) {
+            log.error(ex.getMessage());
         }
     }
 

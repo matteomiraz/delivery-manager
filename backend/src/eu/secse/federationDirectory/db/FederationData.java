@@ -45,9 +45,9 @@ import javax.persistence.TemporalType;
 public class FederationData implements Serializable{
 	private static final long serialVersionUID = -2366324247976962355L;
 
-	public static final String getall="GETALL";
-	public static final String expired="EXPIRED";
-	public static final String like="LIKE";
+	public static final String getall="DIRECTORY_GETALL";
+	public static final String expired="DIRECTORY_EXPIRED";
+	public static final String like="DIRECTORY_LIKE";
 	
 	@Id
 	private String id;

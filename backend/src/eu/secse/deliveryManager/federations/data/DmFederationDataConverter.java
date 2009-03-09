@@ -30,14 +30,14 @@ import eu.secse.federationDirectory.reds.types.RedsFederationProperty;
 public class DmFederationDataConverter implements
 		IDmFederationDataConverter {
 
-	public RedsFederationData convert(Federation f) {		
+	public RedsFederationData convert(DMFederation f) {		
 		if (f==null) return null;
 		RedsFederationData d=new RedsFederationData(f.getId());
 		d.setName(f.getName());
 		d.setMethod(f.getMethod());
 		d.setLeaseExpiration(f.getLease());
 		Collection<RedsFederationProperty> properties=new Vector<RedsFederationProperty>();
-		for (FederationProperty fp: f.getProperties() ) {
+		for (DMFederationProperty fp: f.getProperties() ) {
 			RedsFederationProperty rp=new RedsFederationProperty(fp.getName(),fp.getValue());
 			properties.add(rp);
 		}
@@ -46,16 +46,16 @@ public class DmFederationDataConverter implements
 	}
 
 
-	public Federation convert(RedsFederationData rf) {
+	public DMFederation convert(RedsFederationData rf) {
 		if (rf==null) return null;
-		Federation d=new Federation();
+		DMFederation d=new DMFederation();
 		d.setId(rf.getId().getId());
 		d.setName(rf.getName());
 		d.setMethod(rf.getMethod());
 		d.setLease(rf.getLeaseExpiration());
-		Collection<FederationProperty> properties=new Vector<FederationProperty>();
+		Collection<DMFederationProperty> properties=new Vector<DMFederationProperty>();
 		for (RedsFederationProperty fp: rf.getProperties() ) {
-			FederationProperty rp=new FederationProperty(fp.getName(),fp.getValue());
+			DMFederationProperty rp=new DMFederationProperty(fp.getName(),fp.getValue());
 			properties.add(rp);
 		}
 		d.setProperties(properties);
