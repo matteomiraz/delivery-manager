@@ -40,19 +40,20 @@ import javax.persistence.TemporalType;
  *
  */
 @Entity
-@Table(name="Federation")
+@Table(name="DMFederation")
 @NamedQueries(value={
-		@NamedQuery(name=Federation.getall,query="from Federation"),
-		@NamedQuery(name=Federation.expired, query="from Federation where lease < current_timestamp()" ),
-		@NamedQuery(name=Federation.like, query="from Federation where name like :name"),
-		@NamedQuery(name=Federation.owned, query="from Federation where ownership = true"),
-		@NamedQuery(name=Federation.acquired, query="from Federation where ownership = false"),
-		@NamedQuery(name=Federation.torenew, query="from Federation where renew < current_timestamp() and ownership = true"),
-		@NamedQuery(name=Federation.byname, query="from Federation where :name = name "),
-		@NamedQuery(name=Federation.byUID, query = "from Federation where id = :id")
+		@NamedQuery(name=DMFederation.getall,query="from DMFederation"),
+		@NamedQuery(name=DMFederation.expired, query="from DMFederation where lease < current_timestamp()"  ),
+		@NamedQuery(name=DMFederation.like, query="from DMFederation where name like :name"),
+		@NamedQuery(name=DMFederation.owned, query="from DMFederation where ownership = true"),
+		@NamedQuery(name=DMFederation.acquired, query="from DMFederation where ownership = false"),
+		@NamedQuery(name=DMFederation.torenew, query="from DMFederation where renew < current_timestamp() and ownership = true"),
+		@NamedQuery(name=DMFederation.byname, query="from DMFederation where :name = name "),
+		@NamedQuery(name=DMFederation.byUID, query = "from DMFederation where id = :id")
 		}
 )
-public class Federation {
+        
+public class DMFederation {
 
 	public static final String getall="GETALL";
 	public static final String expired="EXPIRED";
@@ -84,7 +85,7 @@ public class Federation {
 	private Date renew;
 	
 	@OneToMany(cascade=CascadeType.ALL)
-	private Collection<FederationProperty> properties;
+	private Collection<DMFederationProperty> properties;
 		
 	private boolean ownership;
 
@@ -120,12 +121,12 @@ public class Federation {
 		this.ownership = ownership;
 	}
 
-	public Collection<FederationProperty> getProperties() {
+	public Collection<DMFederationProperty> getProperties() {
 		return properties;
 	}
 
 	public void setProperties(
-			Collection<FederationProperty> properties) {
+			Collection<DMFederationProperty> properties) {
 		this.properties = properties;
 	}
 
@@ -149,7 +150,7 @@ public class Federation {
 		if (o1==null || o1.getClass()!=getClass()) {
 			return false;
 		}
-		Federation fed=(Federation)o1;
+		DMFederation fed=(DMFederation)o1;
 		if (id.equals(fed.id)) return true;
 		return false;
 	}

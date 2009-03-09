@@ -344,4 +344,8 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
     public int getSimmetricKeySize() {
         return simmetricKeySize;
     }
+
+    public String getSignatureAlgorithm() {
+        return hashAlgorithm+"With"+privateKey.getAlgorithm();
+    }
 }

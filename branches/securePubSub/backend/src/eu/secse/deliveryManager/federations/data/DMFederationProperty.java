@@ -27,7 +27,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="dmFederationProperty")
-public class FederationProperty implements Serializable{
+public class DMFederationProperty implements Serializable{
 	
 	private static final long serialVersionUID = -7083301839067883179L;
 
@@ -39,9 +39,9 @@ public class FederationProperty implements Serializable{
 	
 	private String value;
 
-	public FederationProperty() {}
+	public DMFederationProperty() {}
 	
-	public FederationProperty(String name, String value) {
+	public DMFederationProperty(String name, String value) {
 		this.name=name;
 		this.value=value;
 	}

@@ -1,10 +1,10 @@
-
-<persistence>
+<persistence
+    xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+    version="1.0">
     <persistence-unit name="deliveryManager">
         <jta-data-source>java:/DefaultDS</jta-data-source>
-        <properties>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-        </properties>
         <class>eu.secse.deliveryManager.data.ElementEnt</class>
         <class>eu.secse.deliveryManager.data.ElementEntPK</class>
         <class>eu.secse.deliveryManager.data.ElementExtraInfo</class>
@@ -21,8 +21,8 @@
         <class>eu.secse.deliveryManager.data.FederatedPromotion</class>
         <class>eu.secse.deliveryManager.data.FederatedPromotionExtraInfo</class>
         <class>eu.secse.deliveryManager.data.ServiceEnt</class>
-        <class>eu.secse.deliveryManager.federations.data.Federation</class>
-        <class>eu.secse.deliveryManager.federations.data.FederationProperty</class>
+        <class>eu.secse.deliveryManager.federations.data.DMFederation</class>
+        <class>eu.secse.deliveryManager.federations.data.DMFederationProperty</class>
         <class>eu.secse.deliveryManager.federations.gossip.data.DeletedElement</class>
         <class>eu.secse.deliveryManager.federations.gossip.data.DeletedService</class>
         <class>eu.secse.deliveryManager.federations.gossip.data.DeletedFacetSchema</class>
@@ -58,16 +58,19 @@
         <class>eu.secse.deliveryManager.sharing.data.CreatedElementExtraInfo</class>
         <class>eu.secse.deliveryManager.sharing.data.ReceivedElementExtraInfo</class>
         <exclude-unlisted-classes/>
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
     </persistence-unit>
   
     <persistence-unit name="federationdirectory">
         <jta-data-source>java:/DefaultDS</jta-data-source>
-        <properties>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-        </properties>
         <class>eu.secse.federationDirectory.db.FederationData</class>
         <class>eu.secse.federationDirectory.db.FederationProperty</class>
         <class>eu.secse.federationDirectory.db.UniqueID</class>
         <exclude-unlisted-classes/>
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+        </properties>
     </persistence-unit>
 </persistence>

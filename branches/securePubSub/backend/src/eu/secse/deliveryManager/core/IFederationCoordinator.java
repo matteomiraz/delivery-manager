@@ -20,7 +20,7 @@ package eu.secse.deliveryManager.core;
 
 import javax.ejb.Local;
 
-import eu.secse.deliveryManager.federations.data.Federation;
+import eu.secse.deliveryManager.federations.data.DMFederation;
 
 @Local
 public interface IFederationCoordinator {
@@ -39,7 +39,7 @@ public interface IFederationCoordinator {
 	 * 
 	 * @param fed
 	 */
-	public void createFederation(Federation fed);
+	public void createFederation(DMFederation fed);
 	
 	public String[] getSupportedMethods();
 }

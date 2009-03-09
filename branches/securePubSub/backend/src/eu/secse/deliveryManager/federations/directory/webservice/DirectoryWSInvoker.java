@@ -24,7 +24,7 @@ import java.util.Vector;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import eu.secse.deliveryManager.federations.data.Federation;
+import eu.secse.deliveryManager.federations.data.DMFederation;
 import eu.secse.deliveryManager.federations.data.IDmFederationDataConverter;
 import eu.secse.federationDirectory.reds.types.RedsFederationData;
 import eu.secse.federationDirectory.wsclient.IDirectoryProxy;
@@ -38,9 +38,9 @@ public class DirectoryWSInvoker implements IDirectoryWSInvoker{
 	@EJB
 	private IDmFederationDataConverter converter;
 	
-	public Collection<Federation> getFederations(String endpoint) {
+	public Collection<DMFederation> getFederations(String endpoint) {
 		Collection<RedsFederationData> data=wsproxy.getAllFederations(endpoint);
-		Collection<Federation> f=new Vector<Federation>();
+		Collection<DMFederation> f=new Vector<DMFederation>();
 		if(data!=null){
 		for (RedsFederationData rdata:data) {
 			f.add(converter.convert(rdata));
@@ -48,14 +48,14 @@ public class DirectoryWSInvoker implements IDirectoryWSInvoker{
 		return f;
 	}
 
-	public Federation getById(String endpoint, String id) {
+	public DMFederation getById(String endpoint, String id) {
 		RedsFederationData data=wsproxy.searchFederationByUid(id,endpoint);
 		return converter.convert(data);
 	}
 
-	public Collection<Federation> getByName(String endpoint, String nameexpression) {
+	public Collection<DMFederation> getByName(String endpoint, String nameexpression) {
 		Collection<RedsFederationData> data=wsproxy.searchFederationByName(nameexpression,endpoint);
-		Collection<Federation> f=new Vector<Federation>();
+		Collection<DMFederation> f=new Vector<DMFederation>();
 		for (RedsFederationData rdata:data) {
 			f.add(converter.convert(rdata));
 		}

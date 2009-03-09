@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.mx.util.MBeanProxyExt;
 import org.jboss.mx.util.MBeanServerLocator;
 
-import eu.secse.deliveryManager.federations.data.Federation;
+import eu.secse.deliveryManager.federations.data.DMFederation;
 import eu.secse.deliveryManager.federations.data.IDmFederationDataConverter;
 import eu.secse.deliveryManager.federations.directoryreds.IRedsDirectoryProxy;
 import eu.secse.federationDirectory.reds.messages.FederationCreation;
@@ -144,18 +144,18 @@ public class FederationCoordinator implements
 			return;
 		}
 		
-		Query q=manager.createNamedQuery(Federation.torenew);
-		List<Federation> torenew=q.getResultList();
-		for (Federation f:torenew) {			
+		Query q=manager.createNamedQuery(DMFederation.torenew);
+		List<DMFederation> torenew=q.getResultList();
+		for (DMFederation f:torenew) {			
 			f.setLease(computeCreationLease());				
 			f.setRenew(computeRenewTime());			
 			FederationCreation fc=new FederationCreation(converter.convert(f));			
 			dirproxy.send(fc);
 		}
 		
-		q=manager.createNamedQuery(Federation.expired);
-		List<Federation> expired=q.getResultList();
-		for (Federation f:expired) {
+		q=manager.createNamedQuery(DMFederation.expired);
+		List<DMFederation> expired=q.getResultList();
+		for (DMFederation f:expired) {
 			if (!f.isOwnership()) {
 				manager.remove(f);
 			}
@@ -184,7 +184,7 @@ public class FederationCoordinator implements
         }
 	}
 
-	public void createFederation(Federation fed) {	
+	public void createFederation(DMFederation fed) {	
 		fed.setLease(computeCreationLease());
 		fed.setRenew(computeRenewTime());
 		dirproxy.send(new FederationCreation(converter.convert(fed)));		

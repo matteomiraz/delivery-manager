@@ -93,8 +93,7 @@ public class RegistryProxy implements IRegistryProxy {
 	/* (non-Javadoc)
 	 * @see eu.secse.deliveryManager.registry.IRegistryProxy#deployService(eu.secse.deliveryManager.model.DService)
 	 */
-	public void storeService(DService srv) throws RemoteException {
-		log.info("deployService(" + srv + ")");
+	public void storeService(DService srv) throws RemoteException {		log.info("deployService(" + srv + ")");
 		
 		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "REGISTRY_ADD_SERVICE", srv.getServiceID());
 		
@@ -107,7 +106,8 @@ public class RegistryProxy implements IRegistryProxy {
 		if(regSrv == null) {
 			log.debug("The registry doesn't have the service id " + srv.getServiceID() + "; publishing that service in the registry");
 
-			registry.deployService(this.registryUsername, this.registryPassword, srv.getServiceID(), srv.getName(), srv.isAllowAdditionalInformation(), srv.getVersion(), srv.getPreviousVersionId(), srv.getTimestamp());
+                        log.debug("Service "+srv+" stored in the registry");
+			//registry.deployService(this.registryUsername, this.registryPassword, srv.getServiceID(), srv.getName(), srv.isAllowAdditionalInformation(), srv.getVersion(), srv.getPreviousVersionId(), srv.getTimestamp());
 			
 		} else {
 			log.warn("The service " + srv.getServiceID() + " is already present in the registry.");

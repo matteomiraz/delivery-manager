@@ -59,8 +59,8 @@ import eu.secse.deliveryManager.data.ServiceEnt;
 import eu.secse.deliveryManager.exceptions.NotFoundException;
 import eu.secse.deliveryManager.exceptions.NotJoinedException;
 import eu.secse.deliveryManager.exceptions.PromotionNotValidException;
-import eu.secse.deliveryManager.federations.data.Federation;
-import eu.secse.deliveryManager.federations.data.FederationProperty;
+import eu.secse.deliveryManager.federations.data.DMFederation;
+import eu.secse.deliveryManager.federations.data.DMFederationProperty;
 import eu.secse.deliveryManager.logger.IPerformanceLogger;
 import eu.secse.deliveryManager.logger.ISecseLoggerProxy;
 import eu.secse.deliveryManager.model.DService;
@@ -104,7 +104,7 @@ public class FederationManager implements
 	/**
 	 * 
 	 * Get all federation details: name, id and type of 
-	 * all the federations holded by the quicker Federation Directory 
+	 * all the federations holded by the quicker DMFederation Directory 
 	 * 
 	 * @return allFederationDetails the information of all federations
 	 */
@@ -122,11 +122,11 @@ public class FederationManager implements
 				log.error(e.getMessage());	      		    
 			}
 			em.flush();
-			Query q = em.createNamedQuery(Federation.getall);
-			Collection<Federation>  federations = q.getResultList();
+			Query q = em.createNamedQuery(DMFederation.getall);
+			Collection<DMFederation>  federations = q.getResultList();
 			allFederations = new FederationDetails[federations.size()];
 			int k = 0;
-			for(Federation f : federations){
+			for(DMFederation f : federations){
 				allFederations[k] = new FederationDetails(f.getId(),f.getName(),f.getMethod());
 				k++;
 			}
@@ -140,7 +140,7 @@ public class FederationManager implements
 		secseLogger.event("Joining the federation " + federationId);
 		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "FM_JOIN", federationId);
 		
-		Federation fed=em.find(Federation.class,federationId);
+		DMFederation fed=em.find(DMFederation.class,federationId);
 		if (fed==null) {
 			//lookup federation coordination manager and refresh
 			  MBeanServer server = MBeanServerLocator.locate();
@@ -152,7 +152,7 @@ public class FederationManager implements
 			        log.error(e.getMessage());	      		    
 				}	   
 				em.flush();
-				fed=em.find(Federation.class,federationId);
+				fed=em.find(DMFederation.class,federationId);
 				if (fed==null) {
 					log.error("Could not join federation " + federationId + ". It is not in the directory");
 					return;
@@ -173,7 +173,7 @@ public class FederationManager implements
 		em.persist(ent);
 		em.flush();
 		HashMap<String,String> options=new HashMap<String,String>();
-		for (FederationProperty prop:fed.getProperties()) {
+		for (DMFederationProperty prop:fed.getProperties()) {
 			options.put(prop.getName(),prop.getValue());
 		}
 		proxy.join(ent,options);		
@@ -187,11 +187,11 @@ public class FederationManager implements
 		return (em.find(FederationEnt.class,federationId)!=null);
 	}
 
-//	private Federation getFederationByName(String name) {
-//		Federation fed=null;
-//		Query byname=em.createNamedQuery(Federation.byname);
+//	private DMFederation getFederationByName(String name) {
+//		DMFederation fed=null;
+//		Query byname=em.createNamedQuery(DMFederation.byname);
 //		byname.setParameter("name",name);
-//		List<Federation> federations=(List<Federation>)byname.getResultList();
+//		List<DMFederation> federations=(List<DMFederation>)byname.getResultList();
 //		if (federations.size()==0) {
 //			log.error("No federation with name " + name + " found");
 //			return null;
@@ -570,7 +570,7 @@ public class FederationManager implements
 		secseLogger.event("Creating federation "+name+" of type "+type);
 		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "FM_CREATE", id);
 		
-		Federation federation=new Federation();
+		DMFederation federation=new DMFederation();
 		federation.setMethod(type);
 		federation.setName(name);
 		//TODO use a more robust federation id generation algorithm
@@ -583,9 +583,9 @@ public class FederationManager implements
 		federation.setId(id);
 		FederationProxy proxy=coordinator.getProxy(type);
 		Map<String,String> options=proxy.getFederationCreationOptions(id);
-		Collection<FederationProperty> props=new Vector<FederationProperty>();
+		Collection<DMFederationProperty> props=new Vector<DMFederationProperty>();
 		for (Entry<String,String> e:options.entrySet()) {
-			FederationProperty prop=new FederationProperty(e.getKey(),e.getValue());
+			DMFederationProperty prop=new DMFederationProperty(e.getKey(),e.getValue());
 			props.add(prop);
 		}
 		federation.setProperties(props);
@@ -607,12 +607,12 @@ public class FederationManager implements
 	@SuppressWarnings("unchecked")
 	public FederationDetails[] searchFederationByName(@WebParam(name="nameRegExp")String nameRegExp) {
 		FederationDetails[] matchingFederations = null;
-		Query q = em.createNamedQuery(Federation.like);
+		Query q = em.createNamedQuery(DMFederation.like);
 		q.setParameter("name", nameRegExp);
-		Collection<Federation> federations = q.getResultList();
+		Collection<DMFederation> federations = q.getResultList();
 		matchingFederations = new FederationDetails[federations.size()];
 		int k=0;
-		for(Federation f: federations){
+		for(DMFederation f: federations){
 			matchingFederations[k] = new FederationDetails(f.getId(), f.getName(), f.getMethod());
 		}
 		return matchingFederations;
@@ -621,9 +621,9 @@ public class FederationManager implements
 	@WebMethod
 	public FederationDetails searchFederationByUID(@WebParam(name="uid")String uid) {
 		FederationDetails matchingFederation = null;
-		Query q = em.createNamedQuery(Federation.byUID);
+		Query q = em.createNamedQuery(DMFederation.byUID);
 		q.setParameter("id", uid);
-		Federation  f = (Federation)q.getSingleResult();
+		DMFederation  f = (DMFederation)q.getSingleResult();
 		matchingFederation = new FederationDetails(f.getId(),f.getName(),f.getMethod());
 		return matchingFederation;
 	}

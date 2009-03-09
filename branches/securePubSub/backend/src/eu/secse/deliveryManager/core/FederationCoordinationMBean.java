@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.Service;
 
 import polimi.reds.LocalDispatchingService;
-import eu.secse.deliveryManager.federations.data.Federation;
+import eu.secse.deliveryManager.federations.data.DMFederation;
 import eu.secse.deliveryManager.federations.directory.webservice.IDirectoryWSInvoker;
 import eu.secse.deliveryManager.federations.directoryreds.RedsDirectoryListener;
 import eu.secse.deliveryManager.utils.IConfiguration;
@@ -112,7 +112,7 @@ public class FederationCoordinationMBean implements
 		}
 		//subscription to: FederationInformationMessage EndpointRequest EndpointInfo
 		dispatcher.subscribe(new DirectoryFilter());
-		//send EndpointRequest message to discover Federation Directories
+		//send EndpointRequest message to discover DMFederation Directories
 		discoverDirectories();
 		
 		//initialize FederationProxy
@@ -160,13 +160,13 @@ public class FederationCoordinationMBean implements
 		status=Status.REFRESHING;
 		clearAcquiredFederations();
 									
-		Collection<Federation> federations=dirinvoker.getFederations(endpoint);
+		Collection<DMFederation> federations=dirinvoker.getFederations(endpoint);
 		log.debug("Directory " + endpoint + " contains " + federations.size() + " federations ");	
 					
 		//Add all federations obtained by the directory, except the existing ones (because of 
 		//previous removal, existing are owned)
-		for (Federation f:federations) {
-			Federation existing=em.find(Federation.class,f.getId());			
+		for (DMFederation f:federations) {
+			DMFederation existing=em.find(DMFederation.class,f.getId());			
 			if (existing==null || !existing.isOwnership()) {
 				log.debug("Adding federation " + f.getId());
 				em.persist(f);
@@ -182,10 +182,10 @@ public class FederationCoordinationMBean implements
 	@SuppressWarnings("unchecked")
 	@TransactionAttribute(value=TransactionAttributeType.REQUIRES_NEW)
 	private void clearAcquiredFederations() {
-		Query q=em.createNamedQuery(Federation.acquired);	
+		Query q=em.createNamedQuery(DMFederation.acquired);	
 //		Remove all but owned federations
-		Collection<Federation> acquiredfederations=(Collection<Federation>)q.getResultList();
-		for (Federation f:acquiredfederations) {
+		Collection<DMFederation> acquiredfederations=(Collection<DMFederation>)q.getResultList();
+		for (DMFederation f:acquiredfederations) {
 			log.debug("Removing federation " + f.getId());		
 			em.remove(f);			
 		}
@@ -198,10 +198,10 @@ public class FederationCoordinationMBean implements
 	
 	@SuppressWarnings("unchecked")
 	public Collection<String> getFederations() {
-		Query q=em.createNamedQuery(Federation.getall);
+		Query q=em.createNamedQuery(DMFederation.getall);
 		Collection<String> fedids=new Vector<String>();
-		Collection<Federation> feds=(Collection<Federation>)q.getResultList();
-		for (Federation f: feds) {
+		Collection<DMFederation> feds=(Collection<DMFederation>)q.getResultList();
+		for (DMFederation f: feds) {
 			fedids.add(f.getId());
 		}
 		return fedids;

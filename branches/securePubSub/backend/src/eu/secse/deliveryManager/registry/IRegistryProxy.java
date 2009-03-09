@@ -30,7 +30,9 @@ import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.FacetSpec;
 import eu.secse.deliveryManager.model.FacetSpecXML;
+import javax.ejb.Local;
 
+@Local
 public interface IRegistryProxy {
 
 	/**

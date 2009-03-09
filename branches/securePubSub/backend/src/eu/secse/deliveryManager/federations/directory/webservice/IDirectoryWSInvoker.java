@@ -22,15 +22,15 @@ import java.util.Collection;
 
 import javax.ejb.Local;
 
-import eu.secse.deliveryManager.federations.data.Federation;
+import eu.secse.deliveryManager.federations.data.DMFederation;
 
 @Local
 public interface IDirectoryWSInvoker {
 	
-	public Collection<Federation> getFederations(String endpoint);
+	public Collection<DMFederation> getFederations(String endpoint);
 	
-	public Federation getById(String endpoint, String id);
+	public DMFederation getById(String endpoint, String id);
 	
-	public Collection<Federation> getByName(String endpoint, String nameexpression);
+	public Collection<DMFederation> getByName(String endpoint, String nameexpression);
 	
 }

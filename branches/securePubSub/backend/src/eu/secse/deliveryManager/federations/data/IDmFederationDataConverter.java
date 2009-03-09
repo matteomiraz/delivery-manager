@@ -24,7 +24,7 @@ import eu.secse.federationDirectory.reds.types.RedsFederationData;
 
 @Local
 public interface IDmFederationDataConverter {
-	public RedsFederationData convert(Federation f);
+	public RedsFederationData convert(DMFederation f);
 	
-	public Federation convert(RedsFederationData rf);
+	public DMFederation convert(RedsFederationData rf);
 }	
