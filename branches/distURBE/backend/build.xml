@@ -1,0 +1,358 @@
+<project name="DeliverManager2.0" default="help">
+
+	<!-- where to store the deployable file -->
+	<property name="artifacts" value="artifacts"/>
+	<property name="build" value="build"/>
+	<property name="lib" value="lib"/>
+
+	<property name="deployable" value="${artifacts}/deliveryManager.ear"/>
+
+	<path id="source.path">
+		<pathelement path="src" />
+		<pathelement path="src-generated" />
+	</path>
+
+	<fileset dir="${build}" id="reds-utils" >
+		<include name="**/reds/**" />
+		<include name="**/deliveryManager/utils/*" />
+	</fileset>
+
+	<fileset dir="${lib}" id="reds" >
+		<include name="reds.jar" />
+	</fileset>
+
+	<fileset dir="build" id="fileset.directory" >
+		<exclude name="**/dire/registry/**" />
+		<exclude name="**/deliveryManager/utils/*" />
+		<exclude name="**/deliveryManager/**" />
+		<exclude name="**/it/**" />
+		<exclude name="**/deliveryManager/**" />
+		<exclude name="**/federationDirectory/wsclient/*" />
+		<exclude name="**/federationDirectory/webservice/*" />
+		<exclude name="**/federationDirectory/wstypes/*" />
+		<exclude name="**/federationDirectory/interfaces/*" />
+		<exclude name="**/federationDirectory/messages/*" />
+		<exclude name="**/deliveryManager/federations/directory/**" />
+		<exclude name="**/reds/**" />
+	</fileset>
+
+	<!-- fake fileset -->
+	<fileset dir="build" id="fileset.fake" >
+		<exclude name="**" />
+	</fileset>
+
+	<fileset dir="build" id="fileset.deliverymanager" >
+		<!-- Using naming convention -->
+		<exclude name="**/dire/registry/data/*" />
+		<exclude name="**/dire/registry/Registry*" />
+		<exclude name="**/it/**" />
+		<exclude name="**/federationDirectory/**" />
+		<exclude name="**/deliveryManager/utils/*" />
+		<exclude name="**/reds/**" />
+		<exclude name="**/deliveryManager/federations/directory/**" />
+	</fileset>
+
+	<target name="help">
+		<echo message="Configure the package using the 'configure' target" />
+		<echo message="To generate a complete package, use the 'pack' target" />
+		<echo message="To pack the deliverymanager or the directory only, use the 'pack-interactive' target" />
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" description="--> Clean .class files and .jar artifacts">
+		<delete dir="${artifacts}"/>
+		<delete dir="${build}" />
+		<delete dir="conf/generated" />
+	</target>
+
+	<!-- 
+         ====================================================== 
+	     Pack the delivery manager only
+         ======================================================
+        -->
+	<target name="pack-deliverymanager" depends="compile,pack-delivery-jar,pack-wsproxy">
+
+		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
+			<fileset dir="${artifacts}">
+				<include name="deliverymanager.jar" />
+				<include name="wsproxy.jar" />
+			</fileset>
+		</ear>
+
+		<zip destfile="${artifacts}/deliveryManager.zip">
+			<fileset dir="${artifacts}">
+				<include name="deliverymanager.ear"/>
+			</fileset>
+			<fileset dir="${registryComponents}">
+				<include name="*"/>
+			</fileset>
+			<fileset dir="descriptors">
+				<include name="*"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="pack" description="Create deployable files">
+		<property name="build.directory" value="fileset.directory" />
+		<property name="build.delivery" value="fileset.deliverymanager" />
+		<antcall target="pack-full"/>
+		<antcall target="pack-broker"/>
+		<antcall target="pack-registry"/>
+		
+		<zip destfile="${artifacts}/dire.zip">
+			<fileset dir="${artifacts}">
+				<include name="deliverymanager.ear"/>
+				<include name="registry.jar"/>
+			</fileset>
+			<fileset dir="descriptors">
+				<include name="*"/>
+			</fileset>
+		</zip>
+
+	</target>
+
+	<!-- 
+         ====================================================== 
+	     Pack the federation directory only
+         ======================================================
+        -->
+	<target name="pack-directory" depends="compile,pack-directory-jar,pack-wsproxy">
+
+		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
+			<fileset dir="${artifacts}">
+				<include name="deliverymanager.jar" />
+				<include name="wsproxy.jar" />
+			</fileset>
+		</ear>
+	</target>
+
+	<!-- 
+         =======================================================
+	     Pack the delivery manager with the federation directory
+         =======================================================
+        -->
+	<target name="pack-full" depends="compile,pack-both,pack-wsproxy">
+		<ear destfile="${artifacts}/deliverymanager.ear" appxml="conf/common/application.xml" update="true">
+			<fileset dir="${artifacts}">
+				<include name="wsproxy.jar" />
+				<include name="deliverymanager.jar" />
+			</fileset>
+		</ear>
+		<delete >
+			<fileset dir="${artifacts}" >
+				<include name="*.jar"/>
+				<include name="*.properties"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- 
+         =======================================================
+	     Interactive packing
+         =======================================================
+        -->
+	<target name="pack-interactive" depends="init" description="Interactive packing">
+		<input message="Do you want to include the Delivery Manager? (Y/n):" addproperty="pack.delivery" validargs="y,n" defaultvalue="y" />
+		<input message="Do you want to include the Federation Directory? (y/N):" addproperty="pack.directory" validargs="y,n" defaultvalue="y" />
+
+		<condition property="build.directory" value="fileset.fake" >
+			<equals arg1="${pack.directory}" arg2="n"/>
+		</condition>
+		<condition property="build.delivery" value="fileset.fake" >
+			<equals arg1="${pack.delivery}" arg2="n"/>
+		</condition>
+		<condition property="build.directory" value="fileset.directory">
+			<equals arg1="${pack.directory}" arg2="y" />
+		</condition>
+		<condition property="build.delivery" value="fileset.deliverymanager">
+			<equals arg1="${pack.delivery}" arg2="y" />
+		</condition>
+		<antcall target="pack-full" />
+	</target>
+
+
+	<!-- ===| Configuration |=== -->
+
+	<target name="configure" depends="init">
+		<input message="Fully qualified name of the machine? :" addproperty="directory.endpoint" defaultvalue="localhost" />
+		<input message="Port to use for gossiping? :" addproperty="gossip.port" defaultvalue="5556" />
+		<input message="Port to use for reds? :" addproperty="reds.port" defaultvalue="5555" />
+		<echo append="false" file="conf/generated/extra.properties" message="${line.separator}Directory.WSEndpoint=http://${directory.endpoint}:8080/deliverymanager-deliverymanager/DirectoryLookupWS">
+		</echo>
+		<echo append="true" file="conf/generated/extra.properties" message="${line.separator}Gossip.Port:${gossip.port}">
+		</echo>
+		<echo append="true" file="conf/generated/extra.properties" message="${line.separator}Gossip.URL:${directory.endpoint}">
+		</echo>
+		<echo append="true" file="conf/generated/extra.properties" message="${line.separator}Reds.port:${reds.port}">
+		</echo>
+		<concat append="false" destfile="conf/generated/config.properties" >
+			<fileset file="conf/common/config.properties" />
+			<fileset file="conf/generated/extra.properties" />
+		</concat>
+	</target>
+
+	<!-- Pack a jar containing both deliverymanager and directory classes-->
+	<target name="pack-both" depends="compile" >
+		<jar destfile="${artifacts}/deliverymanager.jar">
+			<!-- Federation Directory -->
+			<fileset refid="${build.directory}" />
+
+			<!-- Delivery Manager -->
+			<fileset refid="${build.delivery}" />
+
+			<!-- Reds and utils-->
+			<fileset refid="reds" />
+			<fileset refid="reds-utils" />
+
+			<!-- Configuration file -->
+			<fileset dir="conf/delivery-directory">
+				<exclude name="**/application.xml" />
+			</fileset>
+			<fileset dir="conf/generated">
+				<include name="config.properties" />
+			</fileset>
+
+			<!-- use the reds.jar file -->
+			<manifest>
+				<attribute name="Class-Path" value="reds.jar"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- Pack the code for the delivery manager -->
+	<target name="pack-delivery-jar" depends="compile" >
+		<jar destfile="${artifacts}/deliverymanager.jar" >
+			<fileset refid="fileset.deliverymanager" />
+			<fileset dir="${build}">
+				<include name="eu.secse.federationDirectory.db.UniqueID"/>
+			</fileset>
+
+			<fileset dir="conf/deliverymanager">
+				<exclude name="**/application.xml"/>
+			</fileset>
+			<!-- <fileset dir="${artifacts}/common"> -->
+			<fileset dir="conf/generated">
+				<include name="config.properties" />
+			</fileset>
+
+			<!-- Reds and utils -->
+			<fileset refid="reds" />
+			<fileset refid="reds-utils" />
+			
+			<!-- use the reds.jar file -->
+			<manifest>
+				<attribute name="Class-Path" value="reds.jar"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- Pack the code for the federation directory  -->
+	<target name="pack-directory-jar" depends="compile" >
+		<jar destfile="${artifacts}/deliverymanager.jar">
+			<fileset refid="fileset.directory" />
+			<fileset dir="conf/directory/localhost">
+				<exclude name="**/application.xml" />
+			</fileset>
+			<!-- <fileset dir="${artifacts}/common"> -->
+			<fileset dir="conf/generated">
+				<include name="config.properties" />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- Pack the proxy code for web service invocation -->
+	<target name="pack-wsproxy" depends="compile">
+		<jar destfile="${artifacts}/wsproxy.jar">
+			<fileset dir="build" >
+				<include name="**/it/**" />
+				<include name="**/federationDirectory/wsclient/*" />
+				<include name="**/federationDirectory/webservice/*" />
+				<include name="**/federationDirectory/wstypes/*" />
+				<include name="**/federationDirectory/interfaces/*" />
+				<include name="**/federationDirectory/messages/*" />
+				<include name="**/deliveryManager/federations/directory/**" />
+				<exclude name="**/deliveryManager/utils/*" />
+			</fileset>
+			<fileset dir="lib">
+				<include name="axis.jar"/>
+				<include name="commons-discovery-0.2.jar"/>
+				<include name="jaxrpc.jar"/>
+				<include name="saaj.jar"/>
+				<include name="jdom.jar"/>
+			</fileset>
+			<manifest>
+				<attribute name="Class-Path" value="axis.jar jaxrpc.jar commons-discovery-0.2.jar saaj.jar jdom.jar"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="init">
+		<echo>Creating build and artifacts directories</echo>
+		<tstamp/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${artifacts}"/>
+		<mkdir dir="conf/generated"/>
+	</target>
+
+
+	<target name="compile" depends="init">
+		<javac destdir="${build}" debug="true" optimize="true" source="1.5" target="1.5">
+			<src refid="source.path" />
+			<classpath>
+				<fileset dir="${lib}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- ================================= 
+          target: pack-broker              
+         ================================= -->
+	<target name="pack-broker" depends="compile" description="Create reds broker executable file">
+		<jar destfile="${artifacts}/broker.jar" basedir="${build}" excludes="**/NotifyJmsListener.class" update="true">
+			<manifest>
+				<attribute name="Class-Path" value="lib/reds.jar"/>
+				<attribute name="Main-Class" value="eu.secse.reds.Broker"/>
+			</manifest>
+		</jar>
+		<mkdir dir="${artifacts}/lib"/>
+		<copy todir="${artifacts}/lib" file="${lib}/reds.jar"/>
+		<copy todir="${artifacts}" file="startBroker.sh"/>
+		<copy todir="${artifacts}" file="stopBroker.sh"/>
+		<zip destfile="${artifacts}/broker.zip">
+			<fileset dir="${artifacts}">
+				<include name="startBroker.sh"/>
+				<include name="stopBroker.sh"/>
+				<include name="broker.jar"/>
+				<include name="lib/reds.jar"/>
+			</fileset>
+		</zip>
+		<tar destfile="${artifacts}/broker.tgz" compression="gzip">
+			<fileset dir="${artifacts}">
+				<include name="startBroker.sh"/>
+				<include name="stopBroker.sh"/>
+				<include name="broker.jar"/>
+				<include name="lib/reds.jar"/>
+			</fileset>
+		</tar>
+	</target>
+	
+	<!-- ================================= 
+          target: pack-registry              
+         ================================= -->
+    <target name="pack-registry" depends="compile" description="--> Create deployable registry">
+		<jar destfile="${artifacts}/registry.jar" update="true">
+			<fileset dir="${build}">
+			    <include name="dire/registry/**"/>
+			    <include name="**/IUpdate.class"/>
+			</fileset>
+			<fileset dir="conf/registry">
+			    <include name="**"/>
+			</fileset>
+		</jar>
+    </target>
+
+</project>
