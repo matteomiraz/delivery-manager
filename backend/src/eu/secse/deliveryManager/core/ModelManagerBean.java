@@ -62,7 +62,6 @@ import eu.secse.deliveryManager.registry.IRegistryProxy;
  * <b>Nota</b>: le operazioni di effettuate da questo bean sono idempotenti.
  */
 @Stateless
-@TransactionAttribute(value=TransactionAttributeType.REQUIRED)
 public class ModelManagerBean implements ModelManager {
 
 	private static final Log log = LogFactory.getLog(ModelManager.class);

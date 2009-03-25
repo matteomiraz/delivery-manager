@@ -103,6 +103,6 @@ public class SecPubSubFederationExtraInfo extends FederationExtraInfo{
 
 	@SuppressWarnings("unchecked")
 	public static Collection<SecPubSubFederationExtraInfo> getAll(EntityManager em){
-		return em.createQuery("FROM PubSubFederationExtraInfo").getResultList();
+		return em.createQuery("FROM SecPubSubFederationExtraInfo").getResultList();
 	}
 }
