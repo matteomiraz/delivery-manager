@@ -105,10 +105,8 @@ public class RegistryProxy implements IRegistryProxy {
 
 		if(regSrv == null) {
 			log.debug("The registry doesn't have the service id " + srv.getServiceID() + "; publishing that service in the registry");
-
-                        log.debug("Service "+srv+" stored in the registry");
+			log.debug("Service "+srv+" stored in the registry");
 			registry.deployService(this.registryUsername, this.registryPassword, srv.getServiceID(), srv.getName(), srv.isAllowAdditionalInformation(), srv.getVersion(), srv.getPreviousVersionId(), srv.getTimestamp());
-			
 		} else {
 			log.warn("The service " + srv.getServiceID() + " is already present in the registry.");
 		}

@@ -32,7 +32,7 @@ import javax.persistence.NamedQuery;
 @NamedQueries(value={
 		@NamedQuery(name=Event.QUEUE_LENGHT,query="SELECT COUNT(e) FROM Event AS e WHERE e.email= :email"),
 		@NamedQuery(name=Event.FIND_ALL, query="SELECT e FROM Event AS e WHERE e.email = :email ORDER BY e.date ASC"),
-		@NamedQuery(name=Event.READ, query = " SELECT e FROM Event AS e WHERE e.email = :email AND e.read = TRUE ORDER BY e.date ASC")}
+		@NamedQuery(name=Event.READ, query = " SELECT e FROM Event AS e WHERE e.email = :email AND e.isRead = TRUE ORDER BY e.date ASC")}
 )
 public class Event implements Serializable{
 	/**
@@ -68,7 +68,7 @@ public class Event implements Serializable{
 	private String serviceId;
 	
 	/** true if the message is read **/
-	private boolean read;
+	private boolean isRead;
 	
 	//TODO: inserire la data
 	
@@ -81,7 +81,7 @@ public class Event implements Serializable{
 		this.isAdded = isAdded;
 		this.serviceId = serviceId;
 		date = new Timestamp(System.currentTimeMillis());
-		read = false;
+		isRead = false;
 	}
 	public String getSubject() {
 		return subject;
@@ -100,10 +100,10 @@ public class Event implements Serializable{
 	}
 	
 	public boolean isRead() {
-		return read;
+		return isRead;
 	}
 	public void setRead(boolean read) {
-		this.read = read;
+		this.isRead = read;
 	}
 	public Timestamp getDate() {
 		return date;

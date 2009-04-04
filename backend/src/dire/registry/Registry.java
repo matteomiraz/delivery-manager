@@ -69,6 +69,7 @@ public class Registry implements IRegistry {
 		return RegistryId.getRegistryId(em);
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public String deployService(
 			@WebParam(name = "username") String username,
 			@WebParam(name = "passwd") String password,
