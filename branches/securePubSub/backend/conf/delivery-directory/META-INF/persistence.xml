@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
     version="1.0">
     <persistence-unit name="deliveryManager">
-        <jta-data-source>java:/DefaultDS</jta-data-source>
+        <jta-data-source>java:/direDS</jta-data-source>
         <class>eu.secse.deliveryManager.data.ElementEnt</class>
         <class>eu.secse.deliveryManager.data.ElementEntPK</class>
         <class>eu.secse.deliveryManager.data.ElementExtraInfo</class>
@@ -57,6 +57,7 @@
         <class>eu.secse.deliveryManager.sharing.data.filters.InterestServiceEnt</class>
         <class>eu.secse.deliveryManager.sharing.data.CreatedElementExtraInfo</class>
         <class>eu.secse.deliveryManager.sharing.data.ReceivedElementExtraInfo</class>
+        <class>eu.secse.deliveryManager.timeout.LeaseExtraInfo</class>
         <exclude-unlisted-classes/>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
@@ -64,7 +65,7 @@
     </persistence-unit>
   
     <persistence-unit name="federationdirectory">
-        <jta-data-source>java:/DefaultDS</jta-data-source>
+        <jta-data-source>java:/direDS</jta-data-source>
         <class>eu.secse.federationDirectory.db.FederationData</class>
         <class>eu.secse.federationDirectory.db.FederationProperty</class>
         <class>eu.secse.federationDirectory.db.UniqueID</class>

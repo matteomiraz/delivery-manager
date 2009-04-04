@@ -74,7 +74,7 @@ public class Reconnect implements IReconnect{
 			 else if (delta < RedsMBean.STEP * 3 ) 
 				 log.info("Connection warning: currentTime: "+ new Date(current) +" lastMessageTime: "+ new Date(last) + "; delta: " + delta/1000.0f + " seconds");
 			 else  {
-				 log.warn("Connection Losed: currentTime: "+ new Date(current) +" lastMessageTime: "+ new Date(last) + "; delta: " + delta/1000.0f + " seconds. Trying to reconnect");
+				 log.warn("Connection Lost: currentTime: "+ new Date(current) +" lastMessageTime: "+ new Date(last) + "; delta: " + delta/1000.0f + " seconds. Trying to reconnect");
 				 reconnect(redsMBean.getOverlay());
 			}
 		} catch (MalformedObjectNameException e) {			
