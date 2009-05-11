@@ -19,5 +19,7 @@
 	<classpathentry kind="lib" path="lib/jmx-client.jar"/>
 	<classpathentry kind="lib" path="lib/jboss-jaxws.jar"/>
 	<classpathentry kind="lib" path="lib/reds.jar"/>
+	<classpathentry kind="lib" path="lib/urbecore.1.jar"/>
+	<classpathentry kind="lib" path="lib/urbeDescriptor.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

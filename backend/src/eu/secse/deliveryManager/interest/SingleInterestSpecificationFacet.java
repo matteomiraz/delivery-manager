@@ -19,7 +19,6 @@
 package eu.secse.deliveryManager.interest;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,7 +48,7 @@ import eu.secse.deliveryManager.model.XMLCommons;
  *   <li><b>retrive all facet with a particular xsd and an xml that has some properties,</b>: specify both the facetSchema and the xpath;
  * </ul>
  */
-public class SingleInterestSpecificationFacet implements Serializable {
+public class SingleInterestSpecificationFacet implements Interest {
 
 	private static final long serialVersionUID = 8684903789784507923L;
 

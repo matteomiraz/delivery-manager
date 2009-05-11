@@ -31,9 +31,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.Deliverable;
+import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.FacetSpecXML;
 import eu.secse.deliveryManager.model.XMLCommons;
 
