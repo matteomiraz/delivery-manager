@@ -91,6 +91,10 @@ public interface IInterestManager {
 	void subscribeAdditionalInformationFacet(String serviceId, FacetInterest interest, String description) throws NotSubscribedException;
 	
 	
+	public void subscribeFSim(String schema, String query, double threshold) throws NotSubscribedException;
+	public void subscribeNameSim(String schema, String xpath, String[] queries, double threshold) throws NotSubscribedException;
+
+	
 	/**
 	 * This method allows to remove the subscription with the given InterestID.
 	 * If such subscription is not found, an NotSubscribedException is thrown.

@@ -18,9 +18,9 @@
 
 package eu.secse.deliveryManager.interest;
 
-import eu.secse.deliveryManager.model.FacetAddInfo;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.Deliverable;
+import eu.secse.deliveryManager.model.FacetAddInfo;
 
 /**
  * This class allows to retrive a particular facet additional information, whose id is known.
