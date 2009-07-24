@@ -4,8 +4,9 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
     version="1.0">
   <persistence-unit name="federationdirectory">
-    <jta-data-source>java:/direDS</jta-data-source>
+    <jta-data-source>java:/direDS-federationDirectory</jta-data-source>
     <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect"/>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     </properties>
   </persistence-unit>

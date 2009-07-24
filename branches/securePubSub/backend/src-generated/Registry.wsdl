@@ -1,0 +1,722 @@
+<definitions name='RegistryService' targetNamespace='http://registry.dire/' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://registry.dire/' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+ <types>
+  <xs:schema targetNamespace='http://registry.dire/' version='1.0' xmlns:tns='http://registry.dire/' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+   <xs:element name='IllegalStateException' type='tns:IllegalStateException'/>
+   <xs:element name='authenticate' type='tns:authenticate'/>
+   <xs:element name='authenticateResponse' type='tns:authenticateResponse'/>
+   <xs:element name='deployService' type='tns:deployService'/>
+   <xs:element name='deployServiceResponse' type='tns:deployServiceResponse'/>
+   <xs:element name='getAllServiceIds' type='tns:getAllServiceIds'/>
+   <xs:element name='getAllServiceIdsResponse' type='tns:getAllServiceIdsResponse'/>
+   <xs:element name='getFacetAddInfoSignature' type='tns:getFacetAddInfoSignature'/>
+   <xs:element name='getFacetAddInfoSignatureResponse' type='tns:getFacetAddInfoSignatureResponse'/>
+   <xs:element name='getFacetAddInfoXSDs' type='tns:getFacetAddInfoXSDs'/>
+   <xs:element name='getFacetAddInfoXSDsResponse' type='tns:getFacetAddInfoXSDsResponse'/>
+   <xs:element name='getFacetSpecXSDs' type='tns:getFacetSpecXSDs'/>
+   <xs:element name='getFacetSpecXSDsResponse' type='tns:getFacetSpecXSDsResponse'/>
+   <xs:element name='getFacetXmlBySchemaId' type='tns:getFacetXmlBySchemaId'/>
+   <xs:element name='getFacetXmlBySchemaIdResponse' type='tns:getFacetXmlBySchemaIdResponse'/>
+   <xs:element name='getFacetXsdById' type='tns:getFacetXsdById'/>
+   <xs:element name='getFacetXsdByIdResponse' type='tns:getFacetXsdByIdResponse'/>
+   <xs:element name='getRegistryId' type='tns:getRegistryId'/>
+   <xs:element name='getRegistryIdResponse' type='tns:getRegistryIdResponse'/>
+   <xs:element name='getService' type='tns:getService'/>
+   <xs:element name='getServiceIdByFacetId' type='tns:getServiceIdByFacetId'/>
+   <xs:element name='getServiceIdByFacetIdResponse' type='tns:getServiceIdByFacetIdResponse'/>
+   <xs:element name='getServiceResponse' type='tns:getServiceResponse'/>
+   <xs:element name='getServiceSignature' type='tns:getServiceSignature'/>
+   <xs:element name='getServiceSignatureResponse' type='tns:getServiceSignatureResponse'/>
+   <xs:element name='isAdditionalInformation' type='tns:isAdditionalInformation'/>
+   <xs:element name='isAdditionalInformationResponse' type='tns:isAdditionalInformationResponse'/>
+   <xs:element name='registerServiceProvider' type='tns:registerServiceProvider'/>
+   <xs:element name='registerServiceProviderResponse' type='tns:registerServiceProviderResponse'/>
+   <xs:element name='removeFacetXSD' type='tns:removeFacetXSD'/>
+   <xs:element name='removeFacetXSDResponse' type='tns:removeFacetXSDResponse'/>
+   <xs:element name='removeFacetXml' type='tns:removeFacetXml'/>
+   <xs:element name='removeFacetXmlResponse' type='tns:removeFacetXmlResponse'/>
+   <xs:element name='setFacetAddInfoSignature' type='tns:setFacetAddInfoSignature'/>
+   <xs:element name='setFacetAddInfoSignatureResponse' type='tns:setFacetAddInfoSignatureResponse'/>
+   <xs:element name='setServiceSignature' type='tns:setServiceSignature'/>
+   <xs:element name='setServiceSignatureResponse' type='tns:setServiceSignatureResponse'/>
+   <xs:element name='storeFacetXML' type='tns:storeFacetXML'/>
+   <xs:element name='storeFacetXMLResponse' type='tns:storeFacetXMLResponse'/>
+   <xs:element name='storeFacetXSD' type='tns:storeFacetXSD'/>
+   <xs:element name='storeFacetXSDResponse' type='tns:storeFacetXSDResponse'/>
+   <xs:element name='undeployService' type='tns:undeployService'/>
+   <xs:element name='undeployServiceResponse' type='tns:undeployServiceResponse'/>
+   <xs:complexType name='getService'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getServiceResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='tns:serviceWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='serviceWS'>
+    <xs:sequence>
+     <xs:element name='allowAdditionalInformation' type='xs:boolean'/>
+     <xs:element minOccurs='0' name='fullId' type='xs:string'/>
+     <xs:element minOccurs='0' name='name' type='xs:string'/>
+     <xs:element minOccurs='0' name='previousVersionId' type='xs:string'/>
+     <xs:element name='providerId' type='xs:int'/>
+     <xs:element minOccurs='0' name='timestamp' type='xs:string'/>
+     <xs:element minOccurs='0' name='version' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='authenticate'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='authenticateResponse'>
+    <xs:sequence>
+     <xs:element name='return' type='xs:long'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='registerServiceProvider'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='nickname' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='registerServiceProviderResponse'>
+    <xs:sequence>
+     <xs:element name='return' type='xs:long'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getRegistryId'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='getRegistryIdResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='deployService'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='name' type='xs:string'/>
+     <xs:element name='allowAddInfo' type='xs:boolean'/>
+     <xs:element minOccurs='0' name='version' type='xs:string'/>
+     <xs:element minOccurs='0' name='previousVersionId' type='xs:string'/>
+     <xs:element minOccurs='0' name='timestamp' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='deployServiceResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getServiceSignature'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getServiceSignatureResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='tns:signature'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='signature'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='setServiceSignature'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='signature' type='tns:signature'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='setServiceSignatureResponse'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='undeployService'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='undeployServiceResponse'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='storeFacetXSD'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='facet' type='tns:facetWS'/>
+     <xs:element name='addInfo' type='xs:boolean'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='facetWS'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='document' type='xs:string'/>
+     <xs:element minOccurs='0' name='id' type='xs:string'/>
+     <xs:element minOccurs='0' name='name' type='xs:string'/>
+     <xs:element name='providerId' type='xs:int'/>
+     <xs:element minOccurs='0' name='timestamp' type='xs:string'/>
+     <xs:element minOccurs='0' name='typeName' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='storeFacetXSDResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetXsdById'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='id' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetXsdByIdResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='tns:facetWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='storeFacetXML'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='facetSchemaId' type='xs:string'/>
+     <xs:element minOccurs='0' name='facetXml' type='tns:facetWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='storeFacetXMLResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='removeFacetXSD'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='facetId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='removeFacetXSDResponse'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='getFacetXmlBySchemaId'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='facetSchemaId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetXmlBySchemaIdResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='tns:facetWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='removeFacetXml'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='passwd' type='xs:string'/>
+     <xs:element minOccurs='0' name='xmlId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='removeFacetXmlResponse'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='getFacetAddInfoSignature'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='schemaId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetAddInfoSignatureResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='tns:signature'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='setFacetAddInfoSignature'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='username' type='xs:string'/>
+     <xs:element minOccurs='0' name='password' type='xs:string'/>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+     <xs:element minOccurs='0' name='schemaId' type='xs:string'/>
+     <xs:element minOccurs='0' name='signature' type='tns:signature'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='setFacetAddInfoSignatureResponse'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='IllegalStateException'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='message' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='isAdditionalInformation'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='facetId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='isAdditionalInformationResponse'>
+    <xs:sequence>
+     <xs:element name='return' type='xs:boolean'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getServiceIdByFacetId'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='facetId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getServiceIdByFacetIdResponse'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetSpecXSDs'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetSpecXSDsResponse'>
+    <xs:sequence>
+     <xs:element maxOccurs='unbounded' minOccurs='0' name='return' type='tns:facetWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetAddInfoXSDs'>
+    <xs:sequence>
+     <xs:element minOccurs='0' name='serviceId' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getFacetAddInfoXSDsResponse'>
+    <xs:sequence>
+     <xs:element maxOccurs='unbounded' minOccurs='0' name='return' type='tns:facetWS'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='getAllServiceIds'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='getAllServiceIdsResponse'>
+    <xs:sequence>
+     <xs:element maxOccurs='unbounded' minOccurs='0' name='return' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+  </xs:schema>
+ </types>
+ <message name='Registry_setFacetAddInfoSignature'>
+  <part element='tns:setFacetAddInfoSignature' name='setFacetAddInfoSignature'></part>
+ </message>
+ <message name='Registry_deployServiceResponse'>
+  <part element='tns:deployServiceResponse' name='deployServiceResponse'></part>
+ </message>
+ <message name='Registry_getServiceIdByFacetId'>
+  <part element='tns:getServiceIdByFacetId' name='getServiceIdByFacetId'></part>
+ </message>
+ <message name='Registry_registerServiceProvider'>
+  <part element='tns:registerServiceProvider' name='registerServiceProvider'></part>
+ </message>
+ <message name='Registry_getServiceSignature'>
+  <part element='tns:getServiceSignature' name='getServiceSignature'></part>
+ </message>
+ <message name='Registry_getServiceSignatureResponse'>
+  <part element='tns:getServiceSignatureResponse' name='getServiceSignatureResponse'></part>
+ </message>
+ <message name='Registry_getFacetXmlBySchemaIdResponse'>
+  <part element='tns:getFacetXmlBySchemaIdResponse' name='getFacetXmlBySchemaIdResponse'></part>
+ </message>
+ <message name='Registry_getFacetAddInfoXSDsResponse'>
+  <part element='tns:getFacetAddInfoXSDsResponse' name='getFacetAddInfoXSDsResponse'></part>
+ </message>
+ <message name='Registry_getFacetXsdByIdResponse'>
+  <part element='tns:getFacetXsdByIdResponse' name='getFacetXsdByIdResponse'></part>
+ </message>
+ <message name='Registry_storeFacetXMLResponse'>
+  <part element='tns:storeFacetXMLResponse' name='storeFacetXMLResponse'></part>
+ </message>
+ <message name='Registry_removeFacetXml'>
+  <part element='tns:removeFacetXml' name='removeFacetXml'></part>
+ </message>
+ <message name='Registry_storeFacetXSD'>
+  <part element='tns:storeFacetXSD' name='storeFacetXSD'></part>
+ </message>
+ <message name='Registry_setServiceSignatureResponse'>
+  <part element='tns:setServiceSignatureResponse' name='setServiceSignatureResponse'></part>
+ </message>
+ <message name='Registry_getFacetXmlBySchemaId'>
+  <part element='tns:getFacetXmlBySchemaId' name='getFacetXmlBySchemaId'></part>
+ </message>
+ <message name='Registry_storeFacetXML'>
+  <part element='tns:storeFacetXML' name='storeFacetXML'></part>
+ </message>
+ <message name='Registry_getRegistryIdResponse'>
+  <part element='tns:getRegistryIdResponse' name='getRegistryIdResponse'></part>
+ </message>
+ <message name='Registry_isAdditionalInformation'>
+  <part element='tns:isAdditionalInformation' name='isAdditionalInformation'></part>
+ </message>
+ <message name='Registry_removeFacetXmlResponse'>
+  <part element='tns:removeFacetXmlResponse' name='removeFacetXmlResponse'></part>
+ </message>
+ <message name='Registry_removeFacetXSD'>
+  <part element='tns:removeFacetXSD' name='removeFacetXSD'></part>
+ </message>
+ <message name='Registry_deployService'>
+  <part element='tns:deployService' name='deployService'></part>
+ </message>
+ <message name='Registry_getRegistryId'>
+  <part element='tns:getRegistryId' name='getRegistryId'></part>
+ </message>
+ <message name='Registry_getServiceIdByFacetIdResponse'>
+  <part element='tns:getServiceIdByFacetIdResponse' name='getServiceIdByFacetIdResponse'></part>
+ </message>
+ <message name='Registry_setServiceSignature'>
+  <part element='tns:setServiceSignature' name='setServiceSignature'></part>
+ </message>
+ <message name='Registry_getFacetAddInfoXSDs'>
+  <part element='tns:getFacetAddInfoXSDs' name='getFacetAddInfoXSDs'></part>
+ </message>
+ <message name='Registry_getServiceResponse'>
+  <part element='tns:getServiceResponse' name='getServiceResponse'></part>
+ </message>
+ <message name='Registry_getFacetAddInfoSignatureResponse'>
+  <part element='tns:getFacetAddInfoSignatureResponse' name='getFacetAddInfoSignatureResponse'></part>
+ </message>
+ <message name='Registry_removeFacetXSDResponse'>
+  <part element='tns:removeFacetXSDResponse' name='removeFacetXSDResponse'></part>
+ </message>
+ <message name='Registry_getService'>
+  <part element='tns:getService' name='getService'></part>
+ </message>
+ <message name='IllegalStateException'>
+  <part element='tns:IllegalStateException' name='IllegalStateException'></part>
+ </message>
+ <message name='Registry_undeployServiceResponse'>
+  <part element='tns:undeployServiceResponse' name='undeployServiceResponse'></part>
+ </message>
+ <message name='Registry_setFacetAddInfoSignatureResponse'>
+  <part element='tns:setFacetAddInfoSignatureResponse' name='setFacetAddInfoSignatureResponse'></part>
+ </message>
+ <message name='Registry_authenticate'>
+  <part element='tns:authenticate' name='authenticate'></part>
+ </message>
+ <message name='Registry_getFacetSpecXSDsResponse'>
+  <part element='tns:getFacetSpecXSDsResponse' name='getFacetSpecXSDsResponse'></part>
+ </message>
+ <message name='Registry_getFacetSpecXSDs'>
+  <part element='tns:getFacetSpecXSDs' name='getFacetSpecXSDs'></part>
+ </message>
+ <message name='Registry_undeployService'>
+  <part element='tns:undeployService' name='undeployService'></part>
+ </message>
+ <message name='Registry_getAllServiceIds'>
+  <part element='tns:getAllServiceIds' name='getAllServiceIds'></part>
+ </message>
+ <message name='Registry_getFacetXsdById'>
+  <part element='tns:getFacetXsdById' name='getFacetXsdById'></part>
+ </message>
+ <message name='Registry_authenticateResponse'>
+  <part element='tns:authenticateResponse' name='authenticateResponse'></part>
+ </message>
+ <message name='Registry_registerServiceProviderResponse'>
+  <part element='tns:registerServiceProviderResponse' name='registerServiceProviderResponse'></part>
+ </message>
+ <message name='Registry_storeFacetXSDResponse'>
+  <part element='tns:storeFacetXSDResponse' name='storeFacetXSDResponse'></part>
+ </message>
+ <message name='Registry_getAllServiceIdsResponse'>
+  <part element='tns:getAllServiceIdsResponse' name='getAllServiceIdsResponse'></part>
+ </message>
+ <message name='Registry_getFacetAddInfoSignature'>
+  <part element='tns:getFacetAddInfoSignature' name='getFacetAddInfoSignature'></part>
+ </message>
+ <message name='Registry_isAdditionalInformationResponse'>
+  <part element='tns:isAdditionalInformationResponse' name='isAdditionalInformationResponse'></part>
+ </message>
+ <portType name='Registry'>
+  <operation name='authenticate' parameterOrder='authenticate'>
+   <input message='tns:Registry_authenticate'></input>
+   <output message='tns:Registry_authenticateResponse'></output>
+  </operation>
+  <operation name='deployService' parameterOrder='deployService'>
+   <input message='tns:Registry_deployService'></input>
+   <output message='tns:Registry_deployServiceResponse'></output>
+  </operation>
+  <operation name='getAllServiceIds' parameterOrder='getAllServiceIds'>
+   <input message='tns:Registry_getAllServiceIds'></input>
+   <output message='tns:Registry_getAllServiceIdsResponse'></output>
+  </operation>
+  <operation name='getFacetAddInfoSignature' parameterOrder='getFacetAddInfoSignature'>
+   <input message='tns:Registry_getFacetAddInfoSignature'></input>
+   <output message='tns:Registry_getFacetAddInfoSignatureResponse'></output>
+  </operation>
+  <operation name='getFacetAddInfoXSDs' parameterOrder='getFacetAddInfoXSDs'>
+   <input message='tns:Registry_getFacetAddInfoXSDs'></input>
+   <output message='tns:Registry_getFacetAddInfoXSDsResponse'></output>
+  </operation>
+  <operation name='getFacetSpecXSDs' parameterOrder='getFacetSpecXSDs'>
+   <input message='tns:Registry_getFacetSpecXSDs'></input>
+   <output message='tns:Registry_getFacetSpecXSDsResponse'></output>
+  </operation>
+  <operation name='getFacetXmlBySchemaId' parameterOrder='getFacetXmlBySchemaId'>
+   <input message='tns:Registry_getFacetXmlBySchemaId'></input>
+   <output message='tns:Registry_getFacetXmlBySchemaIdResponse'></output>
+  </operation>
+  <operation name='getFacetXsdById' parameterOrder='getFacetXsdById'>
+   <input message='tns:Registry_getFacetXsdById'></input>
+   <output message='tns:Registry_getFacetXsdByIdResponse'></output>
+  </operation>
+  <operation name='getRegistryId' parameterOrder='getRegistryId'>
+   <input message='tns:Registry_getRegistryId'></input>
+   <output message='tns:Registry_getRegistryIdResponse'></output>
+  </operation>
+  <operation name='getService' parameterOrder='getService'>
+   <input message='tns:Registry_getService'></input>
+   <output message='tns:Registry_getServiceResponse'></output>
+  </operation>
+  <operation name='getServiceIdByFacetId' parameterOrder='getServiceIdByFacetId'>
+   <input message='tns:Registry_getServiceIdByFacetId'></input>
+   <output message='tns:Registry_getServiceIdByFacetIdResponse'></output>
+  </operation>
+  <operation name='getServiceSignature' parameterOrder='getServiceSignature'>
+   <input message='tns:Registry_getServiceSignature'></input>
+   <output message='tns:Registry_getServiceSignatureResponse'></output>
+  </operation>
+  <operation name='isAdditionalInformation' parameterOrder='isAdditionalInformation'>
+   <input message='tns:Registry_isAdditionalInformation'></input>
+   <output message='tns:Registry_isAdditionalInformationResponse'></output>
+  </operation>
+  <operation name='registerServiceProvider' parameterOrder='registerServiceProvider'>
+   <input message='tns:Registry_registerServiceProvider'></input>
+   <output message='tns:Registry_registerServiceProviderResponse'></output>
+  </operation>
+  <operation name='removeFacetXSD' parameterOrder='removeFacetXSD'>
+   <input message='tns:Registry_removeFacetXSD'></input>
+   <output message='tns:Registry_removeFacetXSDResponse'></output>
+  </operation>
+  <operation name='removeFacetXml' parameterOrder='removeFacetXml'>
+   <input message='tns:Registry_removeFacetXml'></input>
+   <output message='tns:Registry_removeFacetXmlResponse'></output>
+  </operation>
+  <operation name='setFacetAddInfoSignature' parameterOrder='setFacetAddInfoSignature'>
+   <input message='tns:Registry_setFacetAddInfoSignature'></input>
+   <output message='tns:Registry_setFacetAddInfoSignatureResponse'></output>
+   <fault message='tns:IllegalStateException' name='IllegalStateException'></fault>
+  </operation>
+  <operation name='setServiceSignature' parameterOrder='setServiceSignature'>
+   <input message='tns:Registry_setServiceSignature'></input>
+   <output message='tns:Registry_setServiceSignatureResponse'></output>
+  </operation>
+  <operation name='storeFacetXML' parameterOrder='storeFacetXML'>
+   <input message='tns:Registry_storeFacetXML'></input>
+   <output message='tns:Registry_storeFacetXMLResponse'></output>
+  </operation>
+  <operation name='storeFacetXSD' parameterOrder='storeFacetXSD'>
+   <input message='tns:Registry_storeFacetXSD'></input>
+   <output message='tns:Registry_storeFacetXSDResponse'></output>
+  </operation>
+  <operation name='undeployService' parameterOrder='undeployService'>
+   <input message='tns:Registry_undeployService'></input>
+   <output message='tns:Registry_undeployServiceResponse'></output>
+  </operation>
+ </portType>
+ <binding name='RegistryBinding' type='tns:Registry'>
+  <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http'/>
+  <operation name='authenticate'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='deployService'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getAllServiceIds'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getFacetAddInfoSignature'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getFacetAddInfoXSDs'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getFacetSpecXSDs'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getFacetXmlBySchemaId'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getFacetXsdById'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getRegistryId'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getService'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getServiceIdByFacetId'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getServiceSignature'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='isAdditionalInformation'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='registerServiceProvider'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='removeFacetXSD'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='removeFacetXml'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='setFacetAddInfoSignature'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+   <fault name='IllegalStateException'>
+    <soap:fault name='IllegalStateException' use='literal'/>
+   </fault>
+  </operation>
+  <operation name='setServiceSignature'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='storeFacetXML'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='storeFacetXSD'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='undeployService'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+ </binding>
+ <service name='RegistryService'>
+  <port binding='tns:RegistryBinding' name='RegistryPort'>
+   <soap:address location='http://BlackMamba:8080/registry/Registry'/>
+  </port>
+ </service>
+</definitions>

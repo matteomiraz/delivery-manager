@@ -102,8 +102,8 @@ public class Event implements Serializable{
 	public boolean isRead() {
 		return isRead;
 	}
-	public void setRead(boolean read) {
-		this.isRead = read;
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
 	}
 	public Timestamp getDate() {
 		return date;
