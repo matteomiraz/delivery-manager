@@ -3,13 +3,14 @@ package dire.registry;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
-import javax.ejb.Local;
+import javax.ejb.Remote;
 
 import dire.registry.exception.AuthenticationException;
+import dire.registry.webservices.Signature;
 import dire.registry.ws.FacetWS;
 import dire.registry.ws.ServiceWS;
 
-@Local
+@Remote
 public interface IRegistry {
 
 	public String getRegistryId() throws RemoteException;

@@ -13,7 +13,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Query;
 
-import dire.registry.Signature;
+import dire.registry.webservices.Signature;
 
 @Entity
 @NamedQuery(name=Service.GET_BY_ID, query="FROM Service WHERE fullId = :id")
@@ -124,7 +124,8 @@ public class Service {
 	public static final Service getByFullId(EntityManager em, String id) {
 		Query q = em.createNamedQuery(Service.GET_BY_ID);
 		q.setParameter("id", id);
-		return (Service) q.getSingleResult();
+		Service service = (Service) q.getSingleResult();
+		return service;
 	}
 
 	public Signature getSignature() {
