@@ -95,7 +95,7 @@ public class RegistryProxy implements IRegistryProxy {
 				try {
 					log
 							.info("Trying to authenticate the delivery-manager into the registry");
-					//TODO:() REMOVE THIS COMMENT deliveryManagerID = registry.authenticate(registryUsername, registryPassword);
+					deliveryManagerID = registry.authenticate(registryUsername, registryPassword);
 				} catch (Throwable e) {
 					try {
 						log
@@ -119,7 +119,7 @@ public class RegistryProxy implements IRegistryProxy {
 				}
 
 				// get the registry unique id
-				//TODO:() REMOVE THIS COMMENT registryId = registry.getRegistryId();
+				registryId = registry.getRegistryId();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

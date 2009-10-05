@@ -49,7 +49,6 @@ public class DirectoryProxy implements IDirectoryProxy {
 	
 	private static final Log log= LogFactory.getLog(IDirectoryProxy.class);
 	
-	
 	public Collection<RedsFederationData> getAllFederations(String endpointurl) {
 		try {			
 			IDirectoryLookupWS port=locate(endpointurl);			
