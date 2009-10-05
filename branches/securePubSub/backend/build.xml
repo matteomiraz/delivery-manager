@@ -43,8 +43,7 @@
 
 	<fileset dir="build" id="fileset.deliverymanager" >
 		<!-- Using naming convention -->
-		<exclude name="**/dire/registry/data/*" />
-		<exclude name="**/dire/registry/Registry*" />
+		<exclude name="dire/**" />
 		<exclude name="**/it/**" />
 		<exclude name="**/federationDirectory/**" />
 		<exclude name="**/deliveryManager/utils/*" />
@@ -274,6 +273,8 @@
 				<include name="**/federationDirectory/messages/*" />
 				<include name="**/deliveryManager/federations/directory/**" />
 				<exclude name="**/deliveryManager/utils/*" />
+				<include name="dire/registry/webservices/*" />
+				<include name="eu/secse/deliveryManager/registry/*" />
 			</fileset>
 			<fileset dir="lib">
 				<include name="axis.jar"/>
@@ -347,21 +348,12 @@
 		<jar destfile="${artifacts}/registry.jar" update="true">
 			<fileset dir="${build}">
 			    <include name="dire/registry/**"/>
+				<exclude name="dire/registry/webservices/*"/>
 			    <include name="**/IUpdate.class"/>
 			</fileset>
 			<fileset dir="conf/registry">
 			    <include name="**"/>
 			</fileset>
-			<fileset dir="lib">
-				<include name="axis.jar"/>
-				<include name="commons-discovery-0.2.jar"/>
-				<include name="jaxrpc.jar"/>
-				<include name="saaj.jar"/>
-				<include name="jdom.jar"/>
-			</fileset>
-			<manifest>
-				<attribute name="Class-Path" value="axis.jar jaxrpc.jar commons-discovery-0.2.jar saaj.jar jdom.jar"/>
-			</manifest>
 		</jar>
     </target>
 

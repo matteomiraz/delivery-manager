@@ -6,7 +6,7 @@ import java.util.Collection;
 import javax.ejb.Remote;
 
 import dire.registry.exception.AuthenticationException;
-import dire.registry.webservices.Signature;
+import dire.registry.Signature;
 import dire.registry.ws.FacetWS;
 import dire.registry.ws.ServiceWS;
 
