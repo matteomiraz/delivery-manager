@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="backend/src"/>
+	<classpathentry kind="src" path="backend/src-generated"/>
+	<classpathentry kind="lib" path="backend/lib/axis.jar"/>
+	<classpathentry kind="lib" path="backend/lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="backend/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="backend/lib/ejb3-persistence.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jboss-annotations-ejb3.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jboss-ejb3x.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jboss-j2ee.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jboss-jaxrpc.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jboss-jaxws.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jdom.jar"/>
+	<classpathentry kind="lib" path="backend/lib/jmx-client.jar"/>
+	<classpathentry kind="lib" path="backend/lib/mail-1.4.jar"/>
+	<classpathentry kind="lib" path="backend/lib/reds.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="backend/build"/>
+</classpath>
