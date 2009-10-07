@@ -268,7 +268,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationRequest joinRequest =
                     new SecPubSubFederationRequest(federationEnt.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage joinMessage =
-                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), joinRequest);
+                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), secPubSubMBean.getSymmetricAlgorithm(), secPubSubMBean.getSymmetricKeySize(), joinRequest);
             
             signAndSend(joinMessage);
         } catch (NoSuchProviderException ex) {
@@ -302,7 +302,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationRequest joinRequest =
                     new SecPubSubFederationRequest(federation.getId(), SecPubSubFederationRequestReason.JOIN);
             DirectEncryptedMessage leaveMessage =
-                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), joinRequest);
+                    new DirectEncryptedMessage(fedExtraInfo.getCertificate().getPublicKey(), pubSubMBean.getSymmetricAlgorithm(), pubSubMBean.getSymmetricKeySize(), joinRequest);
             
             signAndSend(leaveMessage);
         } catch (NoSuchProviderException ex) {
@@ -652,7 +652,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationCertificate fedCertificateMsg =
                     new SecPubSubFederationCertificate(user.getFederation(), certificate);
             try {
-                DirectEncryptedMessage message = new DirectEncryptedMessage(user.getUserKey(), pubSubMBean.getSimmetricAlgorithm(), pubSubMBean.getSimmetricKeySize(), fedCertificateMsg);
+                DirectEncryptedMessage message = new DirectEncryptedMessage(user.getUserKey(), pubSubMBean.getSymmetricAlgorithm(), pubSubMBean.getSymmetricKeySize(), fedCertificateMsg);
                 
                 signAndSend(message);
             } catch (NoSuchProviderException ex) {
@@ -698,7 +698,7 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             //Preparing and signing the message
             SecPubSubFederationKey fedKey = new SecPubSubFederationKey(user.getFederation(), fedExtraInfo.getLastKey(), fedExtraInfo.getLastKeyVersion());
             DirectEncryptedMessage federationKeyMessage =
-                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), secPubSubMBean.getSimmetricAlgorithm(), secPubSubMBean.getSimmetricKeySize(), fedKey);
+                    new DirectEncryptedMessage(user.getCertificate().getPublicKey(), secPubSubMBean.getSymmetricAlgorithm(), secPubSubMBean.getSymmetricKeySize(), fedKey);
             
             signAndSend(federationKeyMessage);
         } catch (NoSuchProviderException ex) {
@@ -982,8 +982,8 @@ public class SecPubSubProxy implements ISecPubSubProxy {
             SecPubSubFederationExtraInfo fedExtraInfo = (SecPubSubFederationExtraInfo) fed.getExtraInfo();
 
             //Generating the first federation key
-            String simmetricAlgorithm = secPubSubMBean.getSimmetricAlgorithm();
-            int simmetricKeySize = secPubSubMBean.getSimmetricKeySize();
+            String simmetricAlgorithm = secPubSubMBean.getSymmetricAlgorithm();
+            int simmetricKeySize = secPubSubMBean.getSymmetricKeySize();
 
             KeyGenerator keyGenerator = KeyGenerator.getInstance(simmetricAlgorithm);
             keyGenerator.init(simmetricKeySize);

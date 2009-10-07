@@ -52,9 +52,9 @@ public interface ISecPubSubProxyMBean {
 
     public String getSignatureAlgorithm();
 
-    public String getSimmetricAlgorithm();
+    public String getSymmetricAlgorithm();
 
-    public int getSimmetricKeySize();
+    public int getSymmetricKeySize();
 
     public Collection<X509Certificate> getTrustedCA();
 //	Life cycle methods
