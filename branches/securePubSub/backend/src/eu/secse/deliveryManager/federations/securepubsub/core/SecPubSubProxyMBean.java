@@ -98,10 +98,10 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
     private Certificate[] certChain;
     private Collection<X509Certificate> trustedCA;
     private String hashAlgorithm;
-    private String simmetricAlgorithm;
+    private String symmetricAlgorithm;
     private String crlDistPointBaseURL;
     private int federationCertificateValidityDays;
-    private int simmetricKeySize;
+    private int symmetricKeySize;
 
     public Date getNextExpire() throws IllegalStateException, NoSuchObjectLocalException, EJBException {
         return this.expire.getNextTimeout();
@@ -255,8 +255,8 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         return hashAlgorithm;
     }
 
-    public String getSimmetricAlgorithm() {
-        return simmetricAlgorithm;
+    public String getSymmetricAlgorithm() {
+        return symmetricAlgorithm;
     }
 
     public Collection<X509Certificate> getTrustedCA() {
@@ -317,8 +317,8 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         if (hashAlgorithm.equals("!SecPubSubProxy.hashAlgorithm!")) {
             log.error("Unable to find the hash algorithm to use in config file");
         }
-        this.simmetricAlgorithm = conf.getString("SecPubSubProxy.simmetricAlgorithm");
-        if (simmetricAlgorithm.equals("!SecPubSubProxy.simmetricAlgorithm!")) {
+        this.symmetricAlgorithm = conf.getString("SecPubSubProxy.symmetricAlgorithm");
+        if (symmetricAlgorithm.equals("!SecPubSubProxy.symmetricAlgorithm!")) {
             log.error("Unable to find the simmetric algorithm to use in config file");
         }
         this.crlDistPointBaseURL = conf.getString("SecPubSubProxy.CRLdistribuitionPointBaseURL");
@@ -331,18 +331,18 @@ public class SecPubSubProxyMBean implements ISecPubSubProxyMBean {
         } else {
             federationCertificateValidityDays = Integer.parseInt(federationCertificateValidityDaysStr);
         }
-        String simmetricKeySizeStr = conf.getString("SecPubSubProxy.simmetricKeySize");
-        if (simmetricKeySizeStr.equals("!SecPubSubProxy.simmetricKeySize!")) {
-            simmetricKeySize = 256;
+        String symmetricKeySizeStr = conf.getString("SecPubSubProxy.simmetricKeySize");
+        if (symmetricKeySizeStr.equals("!SecPubSubProxy.simmetricKeySize!")) {
+            symmetricKeySize = 256;
             log.error("Unable to find the CRL dist point in config file");
         } else {
-            simmetricKeySize = Integer.parseInt(simmetricKeySizeStr);
+            symmetricKeySize = Integer.parseInt(symmetricKeySizeStr);
         }
 
     }
 
-    public int getSimmetricKeySize() {
-        return simmetricKeySize;
+    public int getSymmetricKeySize() {
+        return symmetricKeySize;
     }
 
     public String getSignatureAlgorithm() {
