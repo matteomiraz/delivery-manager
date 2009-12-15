@@ -34,14 +34,32 @@ public class MultipleInterestSpecificationFacet implements Interest {
 
 	private static final long serialVersionUID = -3165403040448883388L;
 
+	private final String name;
+	
 	private SingleInterestSpecificationFacet[] single;
 	
-	public MultipleInterestSpecificationFacet(FacetInterest[] interest) throws XPathException, SAXException, IOException, ParserConfigurationException {
+	public MultipleInterestSpecificationFacet(String name, FacetInterest[] interest) throws XPathException, SAXException, IOException, ParserConfigurationException {
+		if(name != null) {
+			this.name = name;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < interest.length; i++) {
+				if(i > 0) sb.append("; ");
+				sb.append(interest[i].getXpath());
+			}
+			
+			this.name = sb.toString();
+		}
+		
 		single = new SingleInterestSpecificationFacet[interest.length];
 		
 		for (int i = 0; i < interest.length; i++) {
-			single[i] = new SingleInterestSpecificationFacet(interest[i].getFacetSchema(), interest[i].getXpath());
+			single[i] = new SingleInterestSpecificationFacet("", interest[i].getFacetSchema(), interest[i].getXpath());
 		}
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public boolean isCoveredBy(Interest other) {
@@ -55,6 +73,11 @@ public class MultipleInterestSpecificationFacet implements Interest {
 			if(!s.matches(elem)) return false;
 		
 		return true;
+	}
+	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
 	}
 
 	@Override
@@ -81,6 +104,6 @@ public class MultipleInterestSpecificationFacet implements Interest {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": " +  single.length + " single parts:" + Arrays.toString(single);
+		return this.getClass().getSimpleName() + ": " +  name;
 	}
 }

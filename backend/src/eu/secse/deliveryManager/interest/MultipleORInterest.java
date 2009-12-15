@@ -29,11 +29,27 @@ import org.xml.sax.SAXException;
 import eu.secse.deliveryManager.model.Deliverable;
 
 public class MultipleORInterest implements Interest {
+	private static final boolean DEBUG = false; 
+
 	private static final long serialVersionUID = 9176930148088186291L;
 
+	private final String name;
+	
 	private Interest[] interests;
 	
-	public MultipleORInterest(Interest ... interests) throws XPathException, SAXException, IOException, ParserConfigurationException {
+	public MultipleORInterest(String name, Interest ... interests) throws XPathException, SAXException, IOException, ParserConfigurationException {
+		if(name != null) {
+			this.name = name;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < interests.length; i++) {
+				if(i > 0) sb.append(" OR ");
+				sb.append(interests[i].getName());
+			}
+			
+			this.name = sb.toString();
+		}
+		
 		this.interests = new Interest[interests.length];
 		
 		for (int i = 0; i < interests.length; i++) {
@@ -41,15 +57,36 @@ public class MultipleORInterest implements Interest {
 		}
 	}
 
+	public String getName() {
+		return this.name;
+	}
+	
 	public boolean isCoveredBy(Interest other) {
 		return false;
 	}
 
 	public boolean matches(Deliverable elem) {
-		for (Interest i : interests) 
-			if(i.matches(elem)) return true;
+		if(DEBUG) System.out.println("  checking " + this.getName());
+
+		for (Interest i : interests)
+			if(i.matches(elem)) {
+				if(DEBUG) System.out.println("     " + i.getName() + ": TRUE");
+				return true;
+			} else {
+				if(DEBUG) System.out.println("     " + i.getName() + ": false");
+			}
 		
-		return true;
+		return false;
+	}
+
+	public float getSimilarity(Deliverable msg) {
+		float max = 0.0f;
+		for (Interest i : interests) {
+			float v = i.getSimilarity(msg);
+			if(max < v) max = v;
+		}
+		
+		return max; 
 	}
 
 	@Override
@@ -76,6 +113,6 @@ public class MultipleORInterest implements Interest {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": " +  interests.length + " single parts:" + Arrays.toString(interests);
+		return this.getClass().getSimpleName() + ": " +  name;
 	}
 }

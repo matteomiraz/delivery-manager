@@ -46,7 +46,7 @@ import eu.secse.reds.messages.WakeUpMessage;
 
 public class Broker {
 
-	private static final int REDS_TCP_PORT = 5555;
+	public static final int REDS_TCP_PORT = 5555;
 	private static final long STEP = 20 * 30 * 1000;
 
 	/**

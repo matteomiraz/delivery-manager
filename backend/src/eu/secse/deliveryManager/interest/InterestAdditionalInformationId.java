@@ -39,6 +39,10 @@ public class InterestAdditionalInformationId implements Interest {
 		this.facetID = facetID;
 	}
 	
+	public String getName() {
+		return serviceID + "." + facetID;
+	}
+	
 	public String getFacetID() {
 		return facetID;
 	}
@@ -60,6 +64,11 @@ public class InterestAdditionalInformationId implements Interest {
 		return false;
 	}
 	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
+	}
+
 	public boolean isCoveredBy(Interest filter) {
 		return this.equals(filter);
 	}
@@ -91,6 +100,6 @@ public class InterestAdditionalInformationId implements Interest {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": sid=" + this.serviceID + " fid=" + this.facetID;
+		return this.getClass().getSimpleName() + ": " + getName();
 	}
 }

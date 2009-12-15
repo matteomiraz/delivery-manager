@@ -18,14 +18,14 @@
 
 package eu.secse.deliveryManager.reds;
 
-
+import perfEval.DeleteTablesInterest;
+import perfEval.FlushLogInterest;
+import perfEval.JobDoneInterest;
+import perfEval.WarmUpIinterest;
 import polimi.reds.ComparableFilter;
 import polimi.reds.Message;
 import eu.secse.RedsPerformanceLogger;
 import eu.secse.deliveryManager.interest.Interest;
-import eu.secse.deliveryManager.interest.InterestAdditionalInformation;
-import eu.secse.deliveryManager.interest.InterestFederation;
-import eu.secse.deliveryManager.interest.MultipleInterestSpecificationFacet;
 import eu.secse.deliveryManager.model.DFederation;
 import eu.secse.deliveryManager.model.DService;
 import eu.secse.deliveryManager.model.Deliverable;
@@ -46,9 +46,20 @@ public class InterestEnvelope implements ComparableFilter {
 		this.node = node;
 	}
 	
+	/**
+	 * Only for testing purposes!
+	 * @param suffix
+	 * @return
+	 * @deprecated
+	 */
+	@Deprecated
+	public InterestEnvelope getCustomNode(String suffix) {
+		return new InterestEnvelope(interest, node + suffix);
+	}
+	
 	public boolean isCoveredBy(ComparableFilter filter) {
 		return filter instanceof InterestEnvelope &&
-			this.interest.isCoveredBy(((InterestEnvelope)filter).interest) ;
+			this.interest.isCoveredBy(((InterestEnvelope)filter).interest);
 	}
 
 	public boolean matches(Message msg) {
@@ -75,16 +86,26 @@ public class InterestEnvelope implements ComparableFilter {
 		long start;
 		if(RedsPerformanceLogger.LOG_MATCH_TIME) start = System.nanoTime();
 		
-		boolean matches = this.interest.matches(deliverable);
-
-		if((RedsPerformanceLogger.LOG_MATCH_TIME) && ( // avoiding useless loggings: filters matches predefines types of messages!
-				(deliverable instanceof DService && this.interest instanceof MultipleInterestSpecificationFacet) || 
-				(deliverable instanceof FacetAddInfo && this.interest instanceof InterestAdditionalInformation) ||
-				(deliverable instanceof DFederation && this.interest instanceof InterestFederation))){
-			long stop = System.nanoTime();
-			RedsPerformanceLogger.getSingleton().logMatchTime(stop, msg.getID().toString(), deliverable.getType(), interest.getClass().getName(), matches, stop-start);
+		boolean matches;
+		try {
+			matches = this.interest.matches(deliverable);
+		} catch (Throwable e) {
+			System.err.println("ERROR " + deliverable.getClass().getCanonicalName() + " / " + interest.getClass().getCanonicalName() + ": " + e);
+			return false;
 		}
-		
+
+		if((RedsPerformanceLogger.LOG_MATCH_TIME) 
+			&& deliverable instanceof DService && 
+			(!(interest instanceof DeleteTablesInterest || interest instanceof FlushLogInterest || interest instanceof JobDoneInterest || interest instanceof WarmUpIinterest))
+//			&&  // avoiding useless loggings: filters matches predefines types of messages!
+//				((deliverable instanceof DService && this.interest instanceof MultipleInterestSpecificationFacet) || 
+//				 (deliverable instanceof FacetAddInfo && this.interest instanceof InterestAdditionalInformation) ||
+//				 (deliverable instanceof DFederation && this.interest instanceof InterestFederation)))
+			){
+			long stop = System.nanoTime();
+			RedsPerformanceLogger.getSingleton().logMatchTime(stop, msg.getID().toString(), deliverable.getType(), interest.getClass().getName(), node, matches, stop-start);
+		}
+
 		return matches;
 	}
 	

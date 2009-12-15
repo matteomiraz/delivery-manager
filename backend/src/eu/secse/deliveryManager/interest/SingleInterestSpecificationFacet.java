@@ -50,8 +50,10 @@ import eu.secse.deliveryManager.model.XMLCommons;
  */
 public class SingleInterestSpecificationFacet implements Interest {
 
-	private static final long serialVersionUID = 8684903789784507923L;
+	private static final long serialVersionUID = -7839985247527578354L;
 
+	private final String name;
+	
 	/** Facet Specification Schema Document */
 	private String schemaDocument;
 	/** Facet Specification Schema Document as DOM Document */
@@ -71,7 +73,12 @@ public class SingleInterestSpecificationFacet implements Interest {
 	/** XPath Compiled Expression: XPATH_HEADER + <b>xpathExpression</b> + XPATH_FOOTER */
 	private transient XPathExpression xpathExpression;
 	
-	public SingleInterestSpecificationFacet(String facetSpecificationSchemaDocument, String xpath) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+	public SingleInterestSpecificationFacet(String name, String facetSpecificationSchemaDocument, String xpath) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+		if(name != null)
+			this.name = name;
+		else
+			this.name = xpath;
+		
 		this.schemaDocument = facetSpecificationSchemaDocument;
 		if(schemaDocument != null) this.dom = XMLCommons.newDocumentBuilder().parse(new InputSource(new StringReader(this.schemaDocument)));
 
@@ -83,6 +90,10 @@ public class SingleInterestSpecificationFacet implements Interest {
 
 	}
 
+	public String getName() {
+		return name;
+	}
+	
 	public String getSchemaDocument() {
 		return this.schemaDocument;
 	}
@@ -131,6 +142,11 @@ public class SingleInterestSpecificationFacet implements Interest {
 		return false;
 	}
 	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
+	}
+
 	private Document getDocumentDOM() {
 		try {
 			if(this.dom == null && schemaDocument != null) 
@@ -185,6 +201,6 @@ public class SingleInterestSpecificationFacet implements Interest {
 	
 	@Override
 	public String toString() {
-		return "\n" + this.getClass().getSimpleName() + ": type=" + this.schemaDocument + " xpath=" + this.facetXmlXpath;
+		return "\n" + this.getClass().getSimpleName() + ":" + this.name;
 	}
 }

@@ -23,6 +23,8 @@ import java.io.Serializable;
 import eu.secse.deliveryManager.model.Deliverable;
 
 public interface Interest extends Serializable {
+	public String getName();
 	public boolean isCoveredBy(Interest other);
 	public boolean matches(Deliverable msg);
+	public float getSimilarity(Deliverable msg);
 }

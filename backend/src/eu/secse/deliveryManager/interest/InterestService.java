@@ -31,12 +31,16 @@ public class InterestService implements Interest {
 
 	private static final long serialVersionUID = -1506528069141046335L;
 
-	private String serviceID;
+	private final String serviceID;
 
 	public InterestService(String serviceID) {
 		this.serviceID = serviceID;
 	}
-	
+
+	public String getName() {
+		return serviceID;
+	}
+
 	public String getServiceID() {
 		return this.serviceID;
 	}
@@ -47,6 +51,11 @@ public class InterestService implements Interest {
 			this.serviceID.equals(((DService) elem).getServiceID());
 	}
 	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
+	}
+
 	public boolean isCoveredBy(Interest filter) {
 		return this.equals(filter);
 	}
@@ -78,6 +87,6 @@ public class InterestService implements Interest {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": sid=" + this.serviceID;
+		return this.getClass().getSimpleName() + ": " + serviceID;
 	}
 }

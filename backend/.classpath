@@ -19,7 +19,34 @@
 	<classpathentry kind="lib" path="lib/jmx-client.jar"/>
 	<classpathentry kind="lib" path="lib/jboss-jaxws.jar"/>
 	<classpathentry kind="lib" path="lib/reds.jar"/>
-	<classpathentry kind="lib" path="lib/urbecore.1.jar"/>
 	<classpathentry kind="lib" path="lib/urbeDescriptor.jar"/>
+	<classpathentry kind="lib" path="lib/urbecore.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="lib/fsim.jar"/>
+	<classpathentry kind="lib" path="lib/icu4j_3_4.jar"/>
+	<classpathentry kind="lib" path="lib/iri.jar"/>
+	<classpathentry kind="lib" path="lib/Jama-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-api.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-impl.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-xjc.jar"/>
+	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="lib/jena.jar"/>
+	<classpathentry kind="lib" path="lib/jenatest.jar"/>
+	<classpathentry kind="lib" path="lib/juddi.jar"/>
+	<classpathentry kind="lib" path="lib/jwnl.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/lpsolve55j.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-1.4-final.jar"/>
+	<classpathentry kind="lib" path="lib/relaxngDatatype.jar"/>
+	<classpathentry kind="lib" path="lib/saaj.jar"/>
+	<classpathentry kind="lib" path="lib/shiftone-jrat.jar"/>
+	<classpathentry kind="lib" path="lib/stax-api.jar"/>
+	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
+	<classpathentry kind="lib" path="lib/wstx-asl-2.8.jar"/>
+	<classpathentry kind="lib" path="lib/wvtool.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/xsdlib.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -25,10 +25,14 @@ public class InterestFederation implements Interest {
 
 	private static final long serialVersionUID = -2110769789843050273L;
 
-	private String federationID;
+	private final String federationID;
 
 	public InterestFederation(String federationID) {
 		this.federationID = federationID;
+	}
+
+	public String getName() {
+		return federationID;
 	}
 
 	public boolean isCoveredBy(Interest filter) {
@@ -47,6 +51,11 @@ public class InterestFederation implements Interest {
 		
 		return result;
 	}
+	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
+	}
 
 	public String getFederationName() {
 		return this.federationID;
@@ -54,6 +63,6 @@ public class InterestFederation implements Interest {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": fedID=" + this.federationID;
+		return this.getClass().getSimpleName() + ": " + this.federationID;
 	}
 }

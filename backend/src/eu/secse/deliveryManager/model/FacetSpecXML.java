@@ -18,21 +18,35 @@
 
 package eu.secse.deliveryManager.model;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 
+import javax.wsdl.Definition;
+import javax.wsdl.WSDLException;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 public class FacetSpecXML implements Serializable {
 
 	private static final long serialVersionUID = 1003133921619875085L;
 
+	private static WSDLReader lettoreWSDL;
+	{
+		try {
+			lettoreWSDL = WSDLFactory.newInstance().newWSDLReader();
+		} catch (WSDLException e) {
+			System.err.println(e.getMessage());
+		}
+	}
+		
 	/** Facet Specification XML id */
 	private String xmlID;
 	
@@ -43,7 +57,10 @@ public class FacetSpecXML implements Serializable {
 	private String document;
 	/** Facet Document as DOM Document */
 	private transient Document dom;
-
+	
+	/** If it is a WSDL, stores the definition */
+	private transient Definition wsdlDefinition;
+	
 	private String timestamp;
 	private String isoTimestamp;
 	
@@ -109,6 +126,31 @@ public class FacetSpecXML implements Serializable {
 			assert(false);
 		}
 		return this.dom;
+	}
+	
+	public Definition getWsdlDefinition() {
+		if(wsdlDefinition==null) {
+			File tmp = null;
+			try {
+				
+				tmp = File.createTempFile("dire_", ".wsdl");
+				FileWriter fw = new FileWriter(tmp);
+				fw.write(document);
+				fw.close();
+				
+				wsdlDefinition = lettoreWSDL.readWSDL(tmp.toURI().toURL().toString());
+				
+			} catch (IOException e) {
+				System.err.println("Cannot convert XML into WSDL Definition: " + e.getMessage());
+			} catch (WSDLException e) {
+				System.err.println("Cannot convert XML into WSDL Definition: " + e.getMessage());
+			} finally {
+				if(tmp != null)
+					tmp.delete();
+			}
+		}
+		
+		return wsdlDefinition;
 	}
 	
 	@Override

@@ -8,10 +8,10 @@ import eu.secse.deliveryManager.utils.LogFileCreator;
 
 public class RedsPerformanceLogger {
 	
-	public static final boolean LOG_MATCH_TIME = false;
+	public static final boolean LOG_MATCH_TIME = true;
 	private static final String PREFIX_MATCH_TIME = "MATCH";
 	
-	public static final boolean LOG_MESSAGES = true;
+	public static final boolean LOG_MESSAGES = false;
 	public static final Object LOG_MESSAGES_OBJ = new Object();
 	private static final String PREFIX_MESSAGES = "MSG";
 	
@@ -23,9 +23,9 @@ public class RedsPerformanceLogger {
 	
 	//--------------------------------------------------------
 	
-	private static final int SIZE = 1024 * 1024; 
-	private static final int FLUSH_SIZE = SIZE - 1024; 
-	private static final String SEPARATOR = "#";
+	private static final int SIZE = 64 * 1024; 
+	private static final int FLUSH_SIZE = SIZE / 2; 
+	private static final String SEPARATOR = ",";
 	private File file;
 	
 	private StringBuffer buffer; 
@@ -33,11 +33,18 @@ public class RedsPerformanceLogger {
 	private RedsPerformanceLogger() { 
 		buffer = new StringBuffer(SIZE);
 		
+		buffer.
+			append(PREFIX_MATCH_TIME).append(SEPARATOR).
+			append("method").append(SEPARATOR).
+			append("matches").append(SEPARATOR).
+			append("time").append("\n");
+
+		
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				try {
 					while(true) {
-						Thread.sleep(5 * 60 * 1000);
+						Thread.sleep(60 * 1000);
 						flush();
 					}
 				} catch (InterruptedException e) {
@@ -51,7 +58,7 @@ public class RedsPerformanceLogger {
 		t.start();
 		
 		try {
-			file = LogFileCreator.createFile("performanceReds", ".log");
+			file = LogFileCreator.createFile("performanceReds", ".csv");
 			System.out.println("logging reds performance in " + file.getAbsolutePath());
 		} catch (IOException e) {
 		}
@@ -66,9 +73,18 @@ public class RedsPerformanceLogger {
 	}
 
 	/* timestamp in nanoseconds */
-	public void logMatchTime(long timestamp, String messageId, String messageType, String filterType, boolean matches, long duration) {
+	public void logMatchTime(long timestamp, String messageId, String messageType, String filterType, String filterNode, boolean matches, long duration) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(PREFIX_MATCH_TIME).append(SEPARATOR).append(timestamp).append(SEPARATOR).append(messageId).append(SEPARATOR).append(messageType).append(SEPARATOR).append(filterType).append(SEPARATOR).append(matches).append(SEPARATOR).append(duration).append("\n");
+
+		//MATCH#1260387897054146000#583c10bfdbd326ba:-57734d2e:12574f90e73:-8000#DeleteTables#perfEval.FlushLogInterest#receiver#false#7000
+		//sb.append(PREFIX_MATCH_TIME).append(SEPARATOR).append(timestamp).append(SEPARATOR).append(messageId).append(SEPARATOR).append(messageType).append(SEPARATOR).append(filterType).append(SEPARATOR).append(filterNode).append(SEPARATOR).append(matches).append(SEPARATOR).append(duration).append("\n");
+
+		sb.
+			append(PREFIX_MATCH_TIME).append(SEPARATOR).
+			append(filterNode).append(SEPARATOR).
+			append(matches).append(SEPARATOR).
+			append(duration).append("\n");
+
 		
 		buffer.append(sb.toString());
 		

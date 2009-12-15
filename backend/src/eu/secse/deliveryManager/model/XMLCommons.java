@@ -42,7 +42,9 @@ public class XMLCommons implements Serializable {
 	}
 
 	public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
-		if(documentBuilderFactory == null) documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		if(documentBuilderFactory == null)
+			documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		
 		return documentBuilderFactory.newDocumentBuilder();
 	}
 

@@ -31,8 +31,6 @@ import eu.secse.deliveryManager.exceptions.NotSubscribedException;
 import eu.secse.deliveryManager.interest.Interest;
 import eu.secse.deliveryManager.interest.InterestAdditionalInformation;
 import eu.secse.deliveryManager.interest.InterestAdditionalInformationId;
-import eu.secse.deliveryManager.interest.InterestFSimSpecificationFacet;
-import eu.secse.deliveryManager.interest.InterestNameSimSpecificationFacet;
 import eu.secse.deliveryManager.interest.InterestService;
 import eu.secse.deliveryManager.interest.MultipleInterestSpecificationFacet;
 import eu.secse.deliveryManager.reds.InterestEnvelope;
@@ -56,7 +54,7 @@ public class InterestManager implements IInterestManager {
 	public void subscribeAdditionalInformationFacet(String serviceId, FacetInterest interest, String description) throws NotSubscribedException {
 		InterestAdditionalInformation i;
 		try {
-			i = new InterestAdditionalInformation(serviceId, interest.getFacetSchema(), interest.getXpath());
+			i = new InterestAdditionalInformation("", serviceId, interest.getFacetSchema(), interest.getXpath());
 		} catch (Exception e) {
 			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
 		} 
@@ -81,7 +79,7 @@ public class InterestManager implements IInterestManager {
 	public void subscribeSpecificationFacet(FacetInterest []interest, String description) throws NotSubscribedException {
 		MultipleInterestSpecificationFacet i;
 		try {
-			i = new MultipleInterestSpecificationFacet(interest);
+			i = new MultipleInterestSpecificationFacet(null, interest);
 		} catch (Exception e) {
 			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
 		} 
@@ -89,24 +87,24 @@ public class InterestManager implements IInterestManager {
 		em.persist(new InterestFacetEnt(FacetInterestType.specificationFacet, null, null, interest, description));
 	}
 	
-	public void subscribeFSim(String schema, String query, double threshold) throws NotSubscribedException {
-		try {
-			Interest i = new InterestFSimSpecificationFacet(schema, query, threshold);
-			redsManager.subscribe(new InterestEnvelope(i, registry.getRegistryId()));
-		} catch (Exception e) {
-			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
-		} 
-	}
-	
-	public void subscribeNameSim(String schema, String xpath, String[] queries, double threshold) throws NotSubscribedException {
-		try {
-			Interest i = new InterestNameSimSpecificationFacet(schema, xpath, queries, threshold);
-			redsManager.subscribe(new InterestEnvelope(i, registry.getRegistryId()));
-		} catch (Exception e) {
-			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
-		} 
-	}
-	
+//	public void subscribeFSim(String schema, String query, double threshold) throws NotSubscribedException {
+//		try {
+//			Interest i = new InterestFSimSpecificationFacet(null, schema, query, threshold);
+//			redsManager.subscribe(new InterestEnvelope(i, registry.getRegistryId()));
+//		} catch (Exception e) {
+//			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
+//		} 
+//	}
+//	
+//	public void subscribeNameSim(String schema, String xpath, String[] queries, double threshold) throws NotSubscribedException {
+//		try {
+//			Interest i = new InterestNameSimSpecificationFacet(schema, xpath, queries, threshold);
+//			redsManager.subscribe(new InterestEnvelope(i, registry.getRegistryId()));
+//		} catch (Exception e) {
+//			throw new NotSubscribedException("Cannot subscribe: " + e.getMessage() + " due to: " + e.getCause());
+//		} 
+//	}
+
 	public void unsubscribe(Interest interest)  {
 		redsManager.unsubscribe(new InterestEnvelope(interest, registry.getRegistryId()));
 	}
