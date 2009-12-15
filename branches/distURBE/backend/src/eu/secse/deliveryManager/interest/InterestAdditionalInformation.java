@@ -56,6 +56,8 @@ public class InterestAdditionalInformation implements Interest {
 
 	private static final long serialVersionUID = 6137563230351844424L;
 
+	private final String name;
+	
 	private String serviceId;
 
 	/** Facet Specification Schema Document */
@@ -77,7 +79,12 @@ public class InterestAdditionalInformation implements Interest {
 	/** XPath Compiled Expression: XPATH_HEADER + <b>xpathExpression</b> + XPATH_FOOTER */
 	private transient XPathExpression xpathExpression;
 	
-	public InterestAdditionalInformation(String serviceId, String facetSpecificationSchemaDocument, String xpath) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+	public InterestAdditionalInformation(String name, String serviceId, String facetSpecificationSchemaDocument, String xpath) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+		if(name != null)
+			this.name = name;
+		else
+			this.name = serviceId + ", " + xpath;
+		
 		this.serviceId = serviceId;
 		
 		this.schemaDocument = facetSpecificationSchemaDocument;
@@ -91,6 +98,10 @@ public class InterestAdditionalInformation implements Interest {
 			this.xpathExpression = null;
 		}
 
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getSchemaDocument() {
@@ -143,6 +154,11 @@ public class InterestAdditionalInformation implements Interest {
 		}
 
 		return false;
+	}
+	
+	public float getSimilarity(Deliverable msg) {
+		if(matches(msg)) return 1;
+		else return 0;
 	}
 	
 	private Document getDocumentDOM() {
@@ -199,6 +215,6 @@ public class InterestAdditionalInformation implements Interest {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + "sid: " + serviceId + " schema=" + this.schemaDocument + " xpath=" + this.facetXmlXpath;
+		return this.getClass().getSimpleName() + ": " + getName();
 	}
 }

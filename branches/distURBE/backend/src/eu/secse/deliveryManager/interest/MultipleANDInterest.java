@@ -29,25 +29,73 @@ import org.xml.sax.SAXException;
 import eu.secse.deliveryManager.model.Deliverable;
 
 public class MultipleANDInterest implements Interest {
+	private static final boolean DEBUG = false; 
+	
 	private static final long serialVersionUID = 9176930148088186291L;
 
+	private final String name;
 	private Interest[] interests;
 	
-	public MultipleANDInterest(Interest ... interests) throws XPathException, SAXException, IOException, ParserConfigurationException {
+	public MultipleANDInterest(String name, Interest ... interests) throws XPathException, SAXException, IOException, ParserConfigurationException {
+		if(name != null) {
+			this.name = name;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < interests.length; i++) {
+				if(i > 0) sb.append(" AND ");
+				sb.append(interests[i].getName());
+			}
+			
+			this.name = sb.toString();
+		}
+
 		this.interests = new Interest[interests.length];
 		
 		for (int i = 0; i < interests.length; i++) {
 			this.interests[i] = interests[i];
 		}
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	public boolean isCoveredBy(Interest other) {
 		return false;
 	}
 
+	// TODO: qui calcolo la media!
+	public float getSimilarity(Deliverable msg) {
+		if(DEBUG) System.out.println("similarity of " + this.getName());
+
+		float sum = 0.0f;
+		float min = 1.0f;
+		for (Interest i : interests) {
+			float v = i.getSimilarity(msg);
+			
+			sum += v; 
+			if(min > v) min = v;
+			
+			if(DEBUG) System.out.println("   " + min + ": " + i.getName() + " = " + v);
+		}
+
+		if(DEBUG) System.out.println("Similarity: " + min);
+
+		return min;
+		//return sum / interests.length;
+	}
+	
 	public boolean matches(Deliverable elem) {
-		for (Interest i : interests) 
-			if(!i.matches(elem)) return false;
+		if(DEBUG) System.out.println("checking " + this.getName());
+		
+		for (Interest i : interests) {
+			if(!i.matches(elem)) { 
+				if(DEBUG) System.out.println("   " + i.getName() + ": FALSE");
+				return false;
+			} else {
+				if(DEBUG) System.out.println("   " + i.getName() + ": true");
+			}
+		}
 		
 		return true;
 	}
@@ -76,6 +124,6 @@ public class MultipleANDInterest implements Interest {
 	
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": " +  interests.length + " single parts:" + Arrays.toString(interests);
+		return this.getClass().getSimpleName() + ": " +  name;
 	}
 }

@@ -45,7 +45,11 @@ import eu.secse.deliveryManager.model.XMLCommons;
 
 public class InterestNameSimSpecificationFacet implements Interest {
 
+	private static final boolean DEBUG = false;
+	
 	private static final long serialVersionUID = 8684903789784507923L;
+
+	private final String name;
 
 	/** Facet Specification Schema Document */
 	private final String schemaDocument;
@@ -71,10 +75,16 @@ public class InterestNameSimSpecificationFacet implements Interest {
 	private transient WSDLSimilarityEngine simEngine;
 	
 	public InterestNameSimSpecificationFacet(String facetSpecificationSchemaDocument, String xpath, String[] queries, double threshold) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
-		this(facetSpecificationSchemaDocument, xpath, "self::node()", queries, threshold);
+		this(null, facetSpecificationSchemaDocument, xpath, "self::node()", queries, threshold);
 	}	
 	
-	public InterestNameSimSpecificationFacet(String facetSpecificationSchemaDocument, String xpath, String xpath2, String[] queries, double threshold) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+	public InterestNameSimSpecificationFacet(String name, String facetSpecificationSchemaDocument, String xpath, String xpath2, String[] queries, double threshold) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+		if(name != null) {
+			this.name = name;
+		} else {
+			this.name = xpath;
+		}
+		
 		this.queries = queries;
 		this.threshold = threshold;
 		
@@ -91,6 +101,10 @@ public class InterestNameSimSpecificationFacet implements Interest {
 		this.xpathExpressionCompiled2 = null;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
 	public String getSchemaDocument() {
 		return this.schemaDocument;
 	}
@@ -168,7 +182,74 @@ public class InterestNameSimSpecificationFacet implements Interest {
 
 		return false;
 	}
-	
+
+	public float getSimilarity(Deliverable elem) {
+		if (elem instanceof DService) {
+			DService srv = (DService) elem;
+			
+			if(srv.getSpecType() == null) return 0;
+			
+			for (FacetSpec facet : srv.getSpecType()) {
+				FacetSpecXML dfs = facet.getFacetSpecificationXML();
+				
+				// if is expressed an xpath constraint, check if the xml is present
+				if(xpathExpressionCompiled == null || dfs != null) {
+					// check if the schema is present or if is the same
+					if (schemaDocument == null  || XMLCommons.compare(this.getDocumentDOM(), facet.getDocumentDOM())) {
+						
+						// if no xpath constraint, this facet matches to the filter!
+						if(xpathExpression == null) return 1;
+						
+						try {	//	compile the xpath expression
+							if(COMPILE_XPATH && this.xpathExpression != null && this.xpathExpressionCompiled == null) 
+								this.xpathExpressionCompiled = XPathFactory.newInstance().newXPath().compile(this.xpathExpression);
+
+							if(COMPILE_XPATH && this.xpathExpression2 != null && this.xpathExpressionCompiled2 == null) 
+								this.xpathExpressionCompiled2 = XPathFactory.newInstance().newXPath().compile(this.xpathExpression2);
+
+						} catch (Exception e) {
+							// Non dovrebbe mai capitare!
+							assert(false);
+						}
+
+						try {
+							NodeList nodeList;
+							if(COMPILE_XPATH) nodeList = (NodeList) this.xpathExpressionCompiled.evaluate(dfs.getDocumentDOM(), XPathConstants.NODESET);
+							else nodeList = (NodeList) XMLCommons.newXPath().evaluate(this.xpathExpression, dfs.getDocumentDOM(), XPathConstants.NODESET);
+							
+							double max = 0.0;
+							for(int j = 0; j < nodeList.getLength(); j++) {
+								Node node = nodeList.item(j);
+								
+								String str;
+								if(COMPILE_XPATH) str = this.xpathExpressionCompiled2.evaluate(node);
+								else str = XMLCommons.newXPath().evaluate(this.xpathExpression2, node);
+								
+								for (String query : queries) {
+									double value = getSimEngine().nameSim(query, str);
+									if(value > max) max = value;
+									if(DEBUG) System.out.println("        sim('" + query + "', '" + str + "') = " + value + " (" + max + ")");
+								}
+							}
+							return (float) max;
+						} catch (XPathExpressionException e) {
+							// Non dovrebbe mai capitare!
+							assert(false);
+						} catch (SimilarityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+		return 0;
+	}
+
 	private WSDLSimilarityEngine getSimEngine() throws SimilarityException {
 		if(simEngine == null) simEngine = WSDLSimilarityEngine.getInstance();
 		return simEngine;
@@ -228,6 +309,6 @@ public class InterestNameSimSpecificationFacet implements Interest {
 	
 	@Override
 	public String toString() {
-		return "\n" + this.getClass().getSimpleName() + ": type=" + this.schemaDocument + " xpath=" + this.xpathExpression;
+		return "\n" + this.getClass().getSimpleName() + ": " + name;
 	}
 }

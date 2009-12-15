@@ -148,7 +148,7 @@ public class ShareManagerMBean implements IShareManagerMBean {
 					if(intFacetEnt.getType().equals(FacetInterestType.additionalInformationFacet))
 						try{
 
-							InterestAdditionalInformation intAddInfo = new InterestAdditionalInformation(((InterestFacetEnt)i).getServiceId(), ((InterestFacetEnt)i).getFacetInterest()[0].getFacetSchema(), ((InterestFacetEnt)i).getFacetInterest()[0].getXpath());
+							InterestAdditionalInformation intAddInfo = new InterestAdditionalInformation("", ((InterestFacetEnt)i).getServiceId(), ((InterestFacetEnt)i).getFacetInterest()[0].getFacetSchema(), ((InterestFacetEnt)i).getFacetInterest()[0].getXpath());
 							this.subscribe(new InterestEnvelope(intAddInfo, registry.getRegistryId()));
 
 						} catch (Exception ex) {

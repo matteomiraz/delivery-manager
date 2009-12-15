@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project distURBE">
+	<!-- ================================= 
+          target: create_run_jar              
+         ================================= -->
+    <target name="create_run_jar" description="Create runnable jars">
+    	<delete file="sim.jar"/>
+    	
+		<delete dir=".lib-tmp"/>
+		<mkdir dir=".lib-tmp"/>
+
+		<unjar dest=".lib-tmp" overwrite="false">
+			<patternset>
+		    	<exclude name="META-INF/*.MF"/>
+			</patternset>
+			<fileset file="lib-minimum/*.jar">
+				<exclude name="*src*.jar"/>
+			</fileset>
+		</unjar>
+    	
+        <jar destfile="sim.jar" >
+            <manifest>
+                <attribute name="Main-Class" value="perfEval.Simulation"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="bin"/>
+        	<fileset dir=".lib-tmp"/>
+        </jar>
+		<delete dir=".lib-tmp"/>
+    </target>
+</project>

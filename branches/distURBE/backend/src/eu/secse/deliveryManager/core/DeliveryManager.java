@@ -310,29 +310,29 @@ public class DeliveryManager implements IDeliveryManager  {
 		return interestFacetEnt.getId();
 	}
 
-	@WebMethod public void subscribeNameSim(@WebParam(name="schema") String schema, 
-											@WebParam(name="xpath") String xpath, 
-											@WebParam(name="queries") String[] queries, 
-											@WebParam(name="threshold") double threshold) throws NotSubscribedException {
-	
-		if(queries == null || queries.length == 0) throw new NotSubscribedException("You must specify at least one query!");
-		
-		secseLogger.event("Subscribing using nameSim");
-		log.debug("Subscribing using nameSim");
-		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "DM_SUB_NAMESIM", "");
-		
-		interestManager.subscribeNameSim(schema, xpath, queries, threshold);
-	}
+//	@WebMethod public void subscribeNameSim(@WebParam(name="schema") String schema, 
+//											@WebParam(name="xpath") String xpath, 
+//											@WebParam(name="queries") String[] queries, 
+//											@WebParam(name="threshold") double threshold) throws NotSubscribedException {
+//	
+//		if(queries == null || queries.length == 0) throw new NotSubscribedException("You must specify at least one query!");
+//		
+//		secseLogger.event("Subscribing using nameSim");
+//		log.debug("Subscribing using nameSim");
+//		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "DM_SUB_NAMESIM", "");
+//		
+//		interestManager.subscribeNameSim(schema, xpath, queries, threshold);
+//	}
 
-	@WebMethod public void subscribeFSim(@WebParam(name="schema") String schema,
-										 @WebParam(name="query") String query, 
-										 @WebParam(name="threshold") double threshold) throws NotSubscribedException {
-		secseLogger.event("Subscribing using fSim");
-		log.debug("Subscribing using fSim");
-		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "DM_SUB_FSIM", "");
-		
-		interestManager.subscribeFSim(schema, query, threshold);
-	}
+//	@WebMethod public void subscribeFSim(@WebParam(name="schema") String schema,
+//										 @WebParam(name="query") String query, 
+//										 @WebParam(name="threshold") double threshold) throws NotSubscribedException {
+//		secseLogger.event("Subscribing using fSim");
+//		log.debug("Subscribing using fSim");
+//		if(pLogger.isEnabled()) pLogger.log(System.currentTimeMillis(), "DM_SUB_FSIM", "");
+//		
+//		interestManager.subscribeFSim(schema, query, threshold);
+//	}
 
 	@WebMethod public void unsubscribe(@WebParam(name="id") long id) throws NotSubscribedException {
 		secseLogger.event("Unsubscribing to element "+id);
@@ -350,7 +350,7 @@ public class DeliveryManager implements IDeliveryManager  {
 			InterestFacetEnt intFacetEnt = (InterestFacetEnt) interestEnt;
 			if(intFacetEnt.getType().compareTo(FacetInterestType.specificationFacet)==0)
 				try{
-				interestManager.unsubscribe(new MultipleInterestSpecificationFacet(intFacetEnt.getFacetInterest()));
+				interestManager.unsubscribe(new MultipleInterestSpecificationFacet(null, intFacetEnt.getFacetInterest()));
 				} catch(Exception ex){
 					ex.printStackTrace();
 				}
@@ -361,7 +361,7 @@ public class DeliveryManager implements IDeliveryManager  {
 				else {
 					if(intFacetEnt.getType().compareTo(FacetInterestType.additionalInformationFacet)==0)
 					try	{
-						interestManager.unsubscribe(new InterestAdditionalInformation(intFacetEnt.getServiceId(), intFacetEnt.getFacetInterest()[0].getFacetSchema(), intFacetEnt.getFacetInterest()[0].getXpath()));
+						interestManager.unsubscribe(new InterestAdditionalInformation("", intFacetEnt.getServiceId(), intFacetEnt.getFacetInterest()[0].getFacetSchema(), intFacetEnt.getFacetInterest()[0].getXpath()));
 					}catch(Exception ex){
 						ex.printStackTrace();
 					}
