@@ -1,0 +1,1 @@
+This project connects different UDDI-like registries
